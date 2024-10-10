@@ -20,7 +20,7 @@ import java.util.Scanner;
  *
  * @author jairo
  */
-public class Tarea9 {
+public class GestorRegistrosLB {
 
     private File f; // Archivo donde se almacenan los registros
     Map<String, Integer> camposYLongitudes; // Mapa de nombres de los campos y sus longitudes
@@ -28,7 +28,7 @@ public class Tarea9 {
     private long numReg = 0; // Número de registros en el archivo
 
     // Constructor que inicializa el archivo y los atributos
-    Tarea9(String ruta, Map<String, Integer> entradaCamposLongitud) throws IOException {
+    GestorRegistrosLB(String ruta, Map<String, Integer> entradaCamposLongitud) throws IOException {
         this.f = new File(ruta); // Se inicializa el archivo
         camposYLongitudes = new LinkedHashMap<>(); // Se inicializa el mapa de campos
 
