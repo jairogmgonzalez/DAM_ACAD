@@ -16,43 +16,67 @@ import org.xml.sax.SAXException;
 
 public class Dom_parser {
 
-    private static final String SEPARADOR = "   ";
+    private static final String SEPARADOR = " ";
 
     public static void muestraNodo(Node nodo, int level, PrintStream ps) {
+        // Se verifica si el parámetro nodo es de tipo Documento o no
         if (nodo.getNodeType() == Node.DOCUMENT_NODE) {
-            nodo = ((Document) nodo).getDocumentElement();
+            Document doc = (Document) nodo; // Se realiza un cast del nodo actual a tipo Documnet
+            
+            ps.println("Documento XML");
+            ps.println("Codificacion: " + doc.getXmlEncoding()); // Se imprime la codificación del XML
+            ps.println("Version: " + doc.getXmlVersion()); // Se imprime la versión del XML
+            ps.println();
+            
+            nodo = ((Document) nodo).getDocumentElement(); // Se obtiene el elemento raíz del documento
+            ps.println(SEPARADOR.repeat(level) + nodo.getNodeName().toUpperCase()); // Se imprime nombre el nodo raíz
+
+        } else {
+            // Se imprime el nombre del nodo
+            ps.print(SEPARADOR.repeat(level) + nodo.getNodeName().toUpperCase() + ": ");
         }
 
-        ps.println(SEPARADOR.repeat(level) + nodo.getNodeName());
+        // Se verifica si el nodo es de tipo Elemento
+        if (nodo.getNodeType() == Node.ELEMENT_NODE) {
+            NamedNodeMap atributos = nodo.getAttributes(); // Se obtiene los atributos del nodo
 
-        NodeList nodosHijos = nodo.getChildNodes();
+            // Se verifica si la lista de atributos no está vacía
+            if (atributos != null && atributos.getLength() > 0) {
+                // Bucle que recorre la lista de atributos
+                for (int i = 0; i < atributos.getLength(); i++) {
+                    Node atributo = atributos.item(i); // Se define el atributo
+                    ps.println("[" + atributo.getNodeName() + " = " + atributo.getNodeValue() + "] ");
+                }
+            }
 
-        for (int i = 0; i < nodosHijos.getLength(); i++) {
-            Node nodoHijo = nodosHijos.item(i);
+            NodeList nodosHijos = nodo.getChildNodes(); // Se obtiene los nodos hijos del nodo
 
-            if (nodoHijo.getNodeType() == Node.ELEMENT_NODE && nodoHijo.getNodeValue() == null) {
-                ps.println(SEPARADOR.repeat(level + 1) + nodoHijo.getNodeName());
+            // Se verifica si la lista de nodos hijos no está vacía
+            if (nodosHijos != null) {
+                // Bucle que recorre la lista de nodos hijos
+                for (int j = 0; j < nodosHijos.getLength(); j++) {
+                    Node nodoHijo = nodosHijos.item(j); // Se define el nodo hijo
 
-                NamedNodeMap atributos = nodoHijo.getAttributes();
-                if (atributos.getLength() != 0) {
-                    for (int j = 0; j < atributos.getLength(); j++) {
-                        Node atributo = atributos.item(j);
-                        ps.println(SEPARADOR.repeat(level + 1) + atributo.getNodeName() + " = " + atributo.getNodeValue());
+                    // Se verifica si el nodo hijo es de tipo Elemento
+                    if (nodoHijo.getNodeType() == Node.ELEMENT_NODE) {
+                        // Llamada recursiva del método para nodos hijos
+                        muestraNodo(nodoHijo, level + 1, ps);
+                    } else if (nodoHijo.getNodeType() == Node.TEXT_NODE) {
+                        String valorTexto = nodoHijo.getNodeValue().trim(); // Se obtiene el texto del nodo
+                        if (!valorTexto.isEmpty()) { // Solo imprime si no está vacío
+                            ps.print(valorTexto); // Imprime el texto sin saltos de línea
+                        }
                     }
                 }
             }
-
-            if (nodoHijo.hasChildNodes()) {
-                NodeList subNodos = nodoHijo.getChildNodes();
-                for (int k = 0; k < subNodos.getLength(); k++){
-                    System.out.println(SEPARADOR.repeat(level + 1) + "pepe");
-                }
-            }
         }
+
+        ps.println();
     }
 
     public static void main(String[] args) {
-        String ruta = args[0];
+
+        String ruta = "catalog.xml"; // Se define la ruta del archivo XML
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setIgnoringComments(true);
