@@ -2,17 +2,20 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 /*
@@ -39,19 +42,33 @@ public class Tarea2 {
             DocumentBuilder db = dbf.newDocumentBuilder(); // Se obtiene un objeto DocumentBuilder de la fábrica
             Document doc = db.parse(new File(ruta)); // Se carga y analiza el archivo XML especificado en la ruta
 
-            System.out.println("Lista de titulos:");
+            /*System.out.println("Lista de titulos: \n");
             mostrarTextoNodo(doc, "title"); // Se llama al método mostrarTextoNodo para mostrar los títulos de todos los libros
-
+             */
             // Se crea un instancia de DOMImplementarion
             DOMImplementation domImpl = db.getDOMImplementation();
 
-            // Se crea un nuevo documento
-            Document librosXML = domImpl.createDocument(null, "Catalogo", null);
+            Document librosXML = domImpl.createDocument(null, "catalogo", null);
 
-            librosXML.setXmlVersion(doc.getXmlVersion()); // Se establece la misma versión del XML original para el traducido
-            librosXML.setXmlStandalone(true); // Se establece el standalone como true
+            Element raizOriginal = doc.getDocumentElement();
+            traducirYCopiar(doc, librosXML, librosXML.getDocumentElement());
 
-            librosXML = traducirXMLOriginal(doc, librosXML);
+            // Crear un TransformerFactory
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
+            // Crear un nuevo Transformer
+            Transformer transformer = transformerFactory.newTransformer();
+
+            // Crear una nueva DOMSource con el documento traducido
+            DOMSource source = new DOMSource(librosXML);
+
+            // Crear un nuevo StreamResult para el archivo de salida
+            StreamResult result = new StreamResult(new File("libros.xml"));
+
+            // Realizar la transformación
+            transformer.transform(source, result);
+
+            System.out.println("El archivo libros.xml ha sido creado con éxito.");
 
             //muestraNodo(librosXML, 0, System.out);
         } catch (FileNotFoundException | ParserConfigurationException | SAXException ex) {
@@ -71,7 +88,7 @@ public class Tarea2 {
         // Se verifica si el nodo existe
         if (nodos.getLength() > 0) {
 
-            // Bucle que recorre cada nodo y devuelve el texto que contiene
+            // Bucle que recorre cada nodo de la lista
             for (int i = 0; i < nodos.getLength(); i++) {
                 Node nodo = nodos.item(i); // Se obtiene el nodo de la iteración
                 System.out.println(i + ". " + nodo.getTextContent()); // Se imprime por pantalla el texto del nodo
@@ -80,82 +97,66 @@ public class Tarea2 {
 
     }
 
-    public static Document traducirXMLOriginal(Node nodo, Document librosXML) {
-        // Verifica si el nodo es un documento y obtén el elemento raíz
-        if (nodo.getNodeType() == Node.DOCUMENT_NODE) {
-            nodo = ((Document) nodo).getDocumentElement(); // Obtener elemento raíz
+    private static void traducirYCopiar(Node nodoOriginal, Document docNuevo, Node nodoPadreNuevo) {
+
+        // Se verifica si el nodo original pasado por parámetro es de tipo Documento
+        if (nodoOriginal.getNodeType() == Node.DOCUMENT_NODE) {
+            nodoOriginal = ((Document) nodoOriginal).getDocumentElement(); // Se obtiene el elemento raíz del documento
         }
 
-        Node nodoTraducido = librosXML.getDocumentElement(); // Nodo raíz del nuevo XML
-        NodeList nodosHijos = nodo.getChildNodes(); // Obtener nodos hijos del nodo original
+        // Se verifica si el nodo es de tipo Elemento
+        if (nodoOriginal.getNodeType() == Node.ELEMENT_NODE) {
+            String nombreTraducido = traducirNombre(nodoOriginal.getNodeName()); // Se obtiene el nombre del nodo traducido
+            Element elementoTraducido = docNuevo.createElement(nombreTraducido);
+            nodoPadreNuevo.appendChild(elementoTraducido);
 
-        if (nodosHijos.getLength() > 0) {
-            for (int i = 0; i < nodosHijos.getLength(); i++) {
-                Node nodoHijo = nodosHijos.item(i); // Obtener cada nodo hijo
-                Element elementoNuevo = null; // Inicializa como null
+            // Se verifica si el nodo original tiene atributos
+            if (nodoOriginal.hasAttributes()) {
+                NamedNodeMap atributos = nodoOriginal.getAttributes(); // Se obtiene una lista con los atributos del nodo
 
-                if (nodoHijo.getNodeType() == Node.ELEMENT_NODE) {
-                    String nombreNodo = nodoHijo.getNodeName(); // Obtener nombre del nodo
+                // Bucle que recorre la lista de atributos
+                for (int i = 0; i < atributos.getLength(); i++) {
+                    Node atributo = atributos.item(i); // Se obtiene el atributo de la iteración
+                    String nombreAtributo = atributo.getNodeName(); // Se obtiene el nombre del atributo
+                    String valorAtributo = atributo.getNodeValue(); // Se obtiene el valor del atributo
+                    elementoTraducido.setAttribute(nombreAtributo, valorAtributo);
 
-                    // Traducción de nombres de nodos
-                    switch (nombreNodo) {
-                        case "book":
-                            elementoNuevo = librosXML.createElement("Libro");
-                            break;
-                        case "author":
-                            elementoNuevo = librosXML.createElement("Autor");
-                            break;
-                        case "title":
-                            elementoNuevo = librosXML.createElement("Titulo");
-                            break;
-                        case "genre":
-                            elementoNuevo = librosXML.createElement("Genero");
-                            break;
-                        case "price":
-                            elementoNuevo = librosXML.createElement("Precio");
-                            break;
-                        case "publish_date":
-                            elementoNuevo = librosXML.createElement("Fecha_publicacion");
-                            break;
-                        case "description":
-                            elementoNuevo = librosXML.createElement("Descripcion");
-                            break;
-                        default:
-                            // Si no se reconoce el nodo, no se hace nada
-                            break;
-                    }
-
-                    // Verificar que se creó un elemento nuevo antes de continuar
-                    if (elementoNuevo != null) {
-                        // Procesar atributos
-                        if (nodoHijo.hasAttributes()) {
-                            NamedNodeMap atributos = nodoHijo.getAttributes();
-                            for (int j = 0; j < atributos.getLength(); j++) {
-                                Node atributoOriginal = atributos.item(j);
-                                String nombreAtributo = atributoOriginal.getNodeName();
-                                String valorAtributo = atributoOriginal.getNodeValue();
-                                elementoNuevo.setAttribute(nombreAtributo, valorAtributo);
-                            }
-                        }
-
-                        if (!nodoHijo.hasChildNodes()) {
-                            // Copiar contenido de texto solo una vez
-                            String textoContenido = nodoHijo.getTextContent().trim();
-                            if (!textoContenido.isEmpty()) {
-                                elementoNuevo.setTextContent(textoContenido);
-                            }
-                        }
-
-                        // Agregar el nuevo elemento al nodo traducido
-                        nodoTraducido.appendChild(elementoNuevo);
-                    }
                 }
+            }           // Se verifica si el nodo original tiene hijos
+            if (nodoOriginal.hasChildNodes()) {
+                NodeList nodosHijo = nodoOriginal.getChildNodes(); // Se obtiene la lista de hijos del nodo
 
-                // Llamada recursiva para traducir nodos hijos
-                traducirXMLOriginal(nodoHijo, librosXML);
+                for (int i = 0; i < nodosHijo.getLength(); i++) {
+                    Node nodoHijo = nodosHijo.item(i);
+                    traducirYCopiar(nodoHijo, docNuevo, elementoTraducido);
+                }
             }
+
+        } else if (nodoOriginal.getNodeType() == Node.TEXT_NODE) {
+            Text textoTraducido = docNuevo.createTextNode(nodoOriginal.getNodeValue());
+            nodoPadreNuevo.appendChild(textoTraducido);
         }
-        return librosXML; // Retornar el nuevo documento XML
+    }
+
+    private static String traducirNombre(String nombre) {
+        switch (nombre) {
+            case "book":
+                return "Libro";
+            case "author":
+                return "Autor";
+            case "title":
+                return "Titulo";
+            case "genre":
+                return "Genero";
+            case "price":
+                return "Precio";
+            case "publish_date":
+                return "Fecha_de_publicacion";
+            case "description":
+                return "Descripcion";
+            default:
+                return nombre;
+        }
     }
 
     public static void muestraNodo(Node nodo, int level, PrintStream ps) {
