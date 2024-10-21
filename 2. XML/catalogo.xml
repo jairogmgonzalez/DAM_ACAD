@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><catalogo><catalog>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Catalogo>
    <Libro id="bk101">
       <Autor>Gambardella, Matthew</Autor>
       <Titulo>XML Developer's Guide</Titulo>
       <Genero>Computer</Genero>
       <Precio>44.95</Precio>
-      <Fecha_de_publicacion>2000-10-01</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-10-01</Fecha_publicacion>
       <Descripcion>An in-depth look at creating applications 
       with XML.</Descripcion>
    </Libro>
@@ -13,7 +13,7 @@
       <Titulo>Midnight Rain</Titulo>
       <Genero>Fantasy</Genero>
       <Precio>5.95</Precio>
-      <Fecha_de_publicacion>2000-12-16</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-12-16</Fecha_publicacion>
       <Descripcion>A former architect battles corporate zombies, 
       an evil sorceress, and her own childhood to become queen 
       of the world.</Descripcion>
@@ -23,7 +23,7 @@
       <Titulo>Maeve Ascendant</Titulo>
       <Genero>Fantasy</Genero>
       <Precio>5.95</Precio>
-      <Fecha_de_publicacion>2000-11-17</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-11-17</Fecha_publicacion>
       <Descripcion>After the collapse of a nanotechnology 
       society in England, the young survivors lay the 
       foundation for a new society.</Descripcion>
@@ -33,7 +33,7 @@
       <Titulo>Oberon's Legacy</Titulo>
       <Genero>Fantasy</Genero>
       <Precio>5.95</Precio>
-      <Fecha_de_publicacion>2001-03-10</Fecha_de_publicacion>
+      <Fecha_publicacion>2001-03-10</Fecha_publicacion>
       <Descripcion>In post-apocalypse England, the mysterious 
       agent known only as Oberon helps to create a new life 
       for the inhabitants of London. Sequel to Maeve 
@@ -44,7 +44,7 @@
       <Titulo>The Sundered Grail</Titulo>
       <Genero>Fantasy</Genero>
       <Precio>5.95</Precio>
-      <Fecha_de_publicacion>2001-09-10</Fecha_de_publicacion>
+      <Fecha_publicacion>2001-09-10</Fecha_publicacion>
       <Descripcion>The two daughters of Maeve, half-sisters, 
       battle one another for control of England. Sequel to 
       Oberon's Legacy.</Descripcion>
@@ -54,7 +54,7 @@
       <Titulo>Lover Birds</Titulo>
       <Genero>Romance</Genero>
       <Precio>4.95</Precio>
-      <Fecha_de_publicacion>2000-09-02</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-09-02</Fecha_publicacion>
       <Descripcion>When Carla meets Paul at an ornithology 
       conference, tempers fly as feathers get ruffled.</Descripcion>
    </Libro>
@@ -63,7 +63,7 @@
       <Titulo>Splish Splash</Titulo>
       <Genero>Romance</Genero>
       <Precio>4.95</Precio>
-      <Fecha_de_publicacion>2000-11-02</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-11-02</Fecha_publicacion>
       <Descripcion>A deep sea diver finds true love twenty 
       thousand leagues beneath the sea.</Descripcion>
    </Libro>
@@ -72,7 +72,7 @@
       <Titulo>Creepy Crawlies</Titulo>
       <Genero>Horror</Genero>
       <Precio>4.95</Precio>
-      <Fecha_de_publicacion>2000-12-06</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-12-06</Fecha_publicacion>
       <Descripcion>An anthology of horror stories about roaches,
       centipedes, scorpions  and other insects.</Descripcion>
    </Libro>
@@ -81,7 +81,7 @@
       <Titulo>Paradox Lost</Titulo>
       <Genero>Science Fiction</Genero>
       <Precio>6.95</Precio>
-      <Fecha_de_publicacion>2000-11-02</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-11-02</Fecha_publicacion>
       <Descripcion>After an inadvertant trip through a Heisenberg
       Uncertainty Device, James Salway discovers the problems 
       of being quantum.</Descripcion>
@@ -91,7 +91,7 @@
       <Titulo>Microsoft .NET: The Programming Bible</Titulo>
       <Genero>Computer</Genero>
       <Precio>36.95</Precio>
-      <Fecha_de_publicacion>2000-12-09</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-12-09</Fecha_publicacion>
       <Descripcion>Microsoft's .NET initiative is explored in 
       detail in this deep programmer's reference.</Descripcion>
    </Libro>
@@ -100,7 +100,7 @@
       <Titulo>MSXML3: A Comprehensive Guide</Titulo>
       <Genero>Computer</Genero>
       <Precio>36.95</Precio>
-      <Fecha_de_publicacion>2000-12-01</Fecha_de_publicacion>
+      <Fecha_publicacion>2000-12-01</Fecha_publicacion>
       <Descripcion>The Microsoft MSXML3 parser is covered in 
       detail, with attention to XML DOM interfaces, XSLT processing, 
       SAX and more.</Descripcion>
@@ -110,10 +110,10 @@
       <Titulo>Visual Studio 7: A Comprehensive Guide</Titulo>
       <Genero>Computer</Genero>
       <Precio>49.95</Precio>
-      <Fecha_de_publicacion>2001-04-16</Fecha_de_publicacion>
+      <Fecha_publicacion>2001-04-16</Fecha_publicacion>
       <Descripcion>Microsoft Visual Studio 7 is explored in depth,
       looking at how Visual Basic, Visual C++, C#, and ASP+ are 
       integrated into a comprehensive development 
       environment.</Descripcion>
    </Libro>
-</catalog></catalogo>
+</Catalogo>

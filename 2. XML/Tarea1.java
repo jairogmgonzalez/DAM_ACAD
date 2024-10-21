@@ -18,7 +18,7 @@ public class Tarea1 {
 
     private static final String SEPARADOR = "  ";
 
-    // Método que muestra el contenido de un documento XML
+    // Mëtodo que muestra el contenido de un documento XML
     public static void muestraNodo(Node nodo, int level, PrintStream ps) {
 
         // Se verifica si el parámetro nodo es de tipo Documento
@@ -28,8 +28,6 @@ public class Tarea1 {
             ps.println(" encoding=\"" + doc.getXmlEncoding() + "\"?>"); // Se imprime la codificación del XML
 
             nodo = ((Document) nodo).getDocumentElement(); // Se obtiene el elemento raíz del documento
-            muestraNodo(nodo, 0, ps); // Se llama recursivamente a muestraNodo para imprimir el XML
-            return; // Se sale del método
         }
 
         // Se verifica si el nodo es de tipo Elemento
