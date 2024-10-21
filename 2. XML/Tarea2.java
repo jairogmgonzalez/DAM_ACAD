@@ -158,15 +158,15 @@ public class Tarea2 {
             case "author":
                 return "Autor"; // Traduce "author" a "Autor"
             case "title":
-                return "Titulo"; // Traduce "title" a "Titulo"
+                return "Título"; // Traduce "title" a "Título"
             case "genre":
-                return "Genero"; // Traduce "genre" a "Genero"
+                return "Género"; // Traduce "genre" a "Género"
             case "price":
                 return "Precio"; // Traduce "price" a "Precio"
             case "publish_date":
-                return "Fecha_publicacion"; // Traduce "publish_date" a "Fecha_publicacion"
+                return "Fecha de publicación"; // Traduce "publish_date" a "Fecha de publicación"
             case "description":
-                return "Descripcion"; // Traduce "description" a "Descripcion"
+                return "Descripción"; // Traduce "description" a "Descripción"
             default:
                 return nombre; // Devuelve el nombre original si no hay traducción
         }
