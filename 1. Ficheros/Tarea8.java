@@ -3,10 +3,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -19,7 +15,7 @@ import java.util.Scanner;
  *
  * @author jairo
  */
-public class GestorRegistros {
+class GestorRegistros {
 
     private File f; // Archivo donde se almacenan los registros
     Map<String, Integer> camposYLongitudes; // Mapa de nombres de los campos y sus longitudes
