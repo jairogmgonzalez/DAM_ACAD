@@ -1,16 +1,16 @@
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JDBC1 {
+public class JDBC2 {
 
     // Conexión activa con la base de datos MySQL para realizar operaciones SQL.
     Connection conexion;
@@ -19,7 +19,7 @@ public class JDBC1 {
     String tabla;
 
     // Constructor para conectar con la base de datos
-    public JDBC1(String url, String usuario, String contraseña, String tabla) {
+    public JDBC2(String url, String usuario, String contraseña, String tabla) {
         try {
             // Se carga el driver de MySQL
             Class.forName("com.mysql.jdbc.Driver");
@@ -43,23 +43,21 @@ public class JDBC1 {
         String resultado = "";
 
         // Sentencia SQL para seleccionar el campo específico de la tabla
-        String sql = "SELECT " + nombreColumna + " FROM " + tabla + " WHERE id = " + numRegistro;
+        String sql = "SELECT " + nombreColumna + " FROM " + tabla + " WHERE id = ?";
 
-        try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+        // Se crea un PreparedStatement para ejecutar la consulta
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            // Se establece el valor para el parámetro de la consulta
+            ps.setInt(1, numRegistro);
 
             // Se ejecuta la consulta y obtiene el resultado
-            ResultSet rs = s.executeQuery(sql);
-
-            // Se obtiene el resultado y se almacena en la variable resultado
-            if (rs.next()) {
-                resultado = rs.getString(nombreColumna);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Se obtiene el resultado y se almacena en la variable resultado
+                if (rs.next()) {
+                    resultado = rs.getString(nombreColumna);
+                }
             }
-
-            // Se cierra el ResultSet y el Statement
-            rs.close();
-            s.close();
 
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -76,21 +74,16 @@ public class JDBC1 {
         // Sentencia SQL para seleccionar todos los valores del campo específico de la tabla
         String sql = "SELECT " + nombreColumna + " FROM " + tabla;
 
-        try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+        // Se crea un PreparedStatement para ejecutar la consulta
+        try (PreparedStatement ps = conexion.prepareStatement(sql);) {
 
             // Se ejecuta la consulta y obtiene el resultado
-            ResultSet rs = s.executeQuery(sql);
-
-            // Se obtiene todos los resultados y se almacenan en la lista
-            while (rs.next()) {
-                resultados.add(rs.getString(nombreColumna));
+            try (ResultSet rs = ps.executeQuery(sql)) {
+                // Se obtiene todos los resultados y se almacenan en la lista
+                while (rs.next()) {
+                    resultados.add(rs.getString(nombreColumna));
+                }
             }
-
-            // Se cierra el ResultSet y el Statement
-            rs.close();
-            s.close();
 
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -105,26 +98,29 @@ public class JDBC1 {
         List<String> resultados = new ArrayList<>();
 
         // Sentencia SQL para seleccionar todos los valores de la tabla
-        String sql = "SELECT * FROM " + tabla + " WHERE id = " + numRegistro;
+        String sql = "SELECT * FROM " + tabla + " WHERE id = ?";
 
-        try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+        // Se crea un PreparedStatement para ejecutar la consulta
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            // Se establece el valor para el parámetro de la consulta
+            ps.setInt(1, numRegistro);
 
             // Se ejecuta la consulta y obtiene el resultado
-            ResultSet rs = s.executeQuery(sql);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Se obtiene todos los resultados y se almacenan en la lista
+                if (rs.next()) {
+                    // Se obtiene información sobre las columnas del ResultSet
+                    ResultSetMetaData metaData = rs.getMetaData();
+                    int columnCount = metaData.getColumnCount(); // Número de columnas en el resultado
 
-            // Se obtiene todos los resultados y se almacenan en la lista
-            if (rs.next()) {
-                // Se obtiene información sobre las columnas del ResultSet
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount(); // Número de columnas en el resultado
-
-                // Se recorre todas las columnas y se agregan sus valores a la lista
-                for (int i = 1; i <= columnCount; i++) {
-                    resultados.add(rs.getString(i));
+                    // Se recorre todas las columnas y se agregan sus valores a la lista
+                    for (int i = 1; i <= columnCount; i++) {
+                        resultados.add(rs.getString(i));
+                    }
                 }
             }
+
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
             return null;
@@ -139,29 +135,32 @@ public class JDBC1 {
         Map<String, String> resultados = new HashMap<>();
 
         // Sentencia SQL para seleccionar todos los valores de la tabla
-        String sql = "SELECT * FROM " + tabla + " WHERE id = " + numRegistro;
+        String sql = "SELECT * FROM " + tabla + " WHERE id = ?";
 
-        try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+        // Se crea un PreparedStatement para ejecutar la consulta
+        try (PreparedStatement ps = conexion.prepareStatement(sql);) {
+
+            // Se establece el valor para el parámetro de la consulta
+            ps.setInt(1, numRegistro);
 
             // Se ejecuta la consulta y obtiene el resultado
-            ResultSet rs = s.executeQuery(sql);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Se obtiene todos los resultados y se almacenan en la lista
+                if (rs.next()) {
+                    // Se obtiene información sobre las columnas del ResultSet
+                    ResultSetMetaData metaData = rs.getMetaData();
+                    int columnCount = metaData.getColumnCount(); // Número de columnas en el resultado
 
-            // Se obtiene todos los resultados y se almacenan en la lista
-            if (rs.next()) {
-                // Se obtiene información sobre las columnas del ResultSet
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount(); // Número de columnas en el resultado
+                    // Se recorre todas las columnas y se agregan sus valores a la lista
+                    for (int i = 1; i <= columnCount; i++) {
+                        // Se obtiene el nombre de la columna para añadirla al mapa como clave
+                        String nombreColumna = metaData.getColumnName(i);
 
-                // Se recorre todas las columnas y se agregan sus valores a la lista
-                for (int i = 1; i <= columnCount; i++) {
-                    // Se obtiene el nombre de la columna para añadirla al mapa como clave
-                    String nombreColumna = metaData.getColumnName(i);
-
-                    resultados.put(nombreColumna, rs.getString(i));
+                        resultados.put(nombreColumna, rs.getString(i));
+                    }
                 }
             }
+
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
             return null;
@@ -172,78 +171,156 @@ public class JDBC1 {
 
     // Método para actualizar un registro de la tabla en la base de datos
     public void update(int row, Map<String, String> datos) {
-        // Sentencia SQL para actualizar un registro de la tabla
+        // Construcción de la sentencia SQL para actualizar un registro de la tabla
         StringBuilder sql = new StringBuilder("UPDATE " + tabla + " SET ");
 
         // Se recorre el mapa de datos para completar la sentencia SQL
         for (Map.Entry<String, String> entry : datos.entrySet()) {
-            sql.append(entry.getKey())
-                    .append(" = '")
-                    .append(entry.getValue())
-                    .append("',");
+            sql.append(entry.getKey()).append(" = ?,");
         }
 
         // Se elimina la última coma
         sql.setLength(sql.length() - 1);
 
         // Se agrega el WHERE para filtrar la fila al actualizar
-        sql.append(" WHERE id = ").append(row);
+        sql.append(" WHERE id = ?");
 
         try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+            // Se establece el autocommit a false para evitar que se guarde la transacción automáticamente
+            conexion.setAutoCommit(false);
 
-            // Se ejecuta la consulta
-            int filasActualizadas = s.executeUpdate(sql.toString());
+            // Se crea un PreparedStatement para ejecutar la consulta
+            try (PreparedStatement ps = conexion.prepareStatement(sql.toString())) {
 
-            System.out.println("Filas actualizadas: " + filasActualizadas);
+                // Contador para establecer los valores de los parámetros
+                int index = 1;
 
-            // Se cierra el Statement
-            s.close();
+                // Se reemplaza los valores de los parámetros con los valores de los datos
+                for (Map.Entry<String, String> entry : datos.entrySet()) {
+                    ps.setString(index++, entry.getValue());
+                }
+
+                // Se reemplaza el valor del parámetro para el WHERE
+                ps.setInt(index, row);
+
+                // Se ejecuta la consulta
+                int filasActualizadas = ps.executeUpdate();
+
+                // Se confirma la transacción
+                conexion.commit();
+
+                System.out.println("Filas actualizadas: " + filasActualizadas);
+
+            }
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            try {
+                // Se devuelve la transacción al estado anterior
+                conexion.rollback();
+
+                System.out.println("Transacción revertida por un error");
+            } catch (SQLException rollBackEx) {
+                System.err.println("Error al deshacer la transacción: " + rollBackEx.getMessage());
+            }
+            System.out.println("Error al actualizar el registro: " + e.getMessage());
+        } finally {
+            try {
+                // Se restaura el autocommit al estado anterior
+                conexion.setAutoCommit(true);
+            } catch (SQLException setAutoCommitEx) {
+                System.err.println("Error al restaurar el autocommit: " + setAutoCommitEx.getMessage());
+            }
         }
     }
 
     // Método para actualizar un campo específico de un registro de la tabla en la base de datos
     public void update(int row, String nombreColumna, String valor) {
         // Sentencia SQL para actualizar un campo específico de un registro de la tabla
-        String sql = "UPDATE " + tabla + " SET " + nombreColumna + " = '" + valor + "' WHERE id = " + row;
+        String sql = "UPDATE " + tabla + " SET " + nombreColumna + " = ? WHERE id = ?";
 
         try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+            // Se establece el autocommit a false para evitar que se guarde la transacción automáticamente
+            conexion.setAutoCommit(false);
 
-            // Se ejecuta la consulta
-            s.executeUpdate(sql);
+            // Se crea un PreparedStatement para ejecutar la consulta
+            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-            System.out.println("Campo actualizado");
+                // Se establece los valores para los parámetros de la consulta
+                ps.setString(1, valor);
+                ps.setInt(2, row);
 
-            // Se cierra el statement
-            s.close();
+                // Se ejecuta la consulta
+                ps.executeUpdate();
+
+                // Se confirma la transacción
+                conexion.commit();
+
+                System.out.println("Campo actualizado");
+
+            }
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            try {
+                // Se devuelve la transacción al estado anterior
+                conexion.rollback();
+
+                System.out.println("Transacción revertida por un error");
+            } catch (SQLException rollBackEx) {
+                System.err.println("Error al deshacer la transacción: " + rollBackEx.getMessage());
+            }
+
+            System.out.println("Error al actualizar el campo: " + e.getMessage());
+        } finally {
+            try {
+                // Se establece el autocommit a true para volver a guardar la transacción automáticamente
+                conexion.setAutoCommit(true);
+            } catch (SQLException setAutoCommitEx) {
+                System.err.println("Error al restaurar el autocommit: " + setAutoCommitEx.getMessage());
+            }
         }
     }
 
     // Método para eliminar un registro de la tabla en la base de datos
     public void delete(int row) {
         // Sentencia SQL para eliminar un registro de la tabla
-        String sql = "DELETE FROM " + tabla + " WHERE id = " + row;
+        String sql = "DELETE FROM " + tabla + " WHERE id = ?";
 
         try {
-            // Se crea un statement para ejecutar la consulta
-            Statement s = conexion.createStatement();
+            // Se establece el autocommit a false para evitar que se guarde la transacción automáticamente
+            conexion.setAutoCommit(false);
 
-            // Se ejecuta la consulta
-            s.executeUpdate(sql);
+            // Se crea un PreparedStatement para ejecutar la consulta
+            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+                // Se establece el valor para el parámetro de la consulta
+                ps.setInt(1, row);
 
-            System.out.println("Fila eliminada");
+                // Se ejecuta la consulta
+                int filasEliminadas = ps.executeUpdate();
 
-            // Se cierra el statement
-            s.close();
+                // Se confirma la transacción
+                conexion.commit();
+
+                System.out.println("Filas eliminadas: " + filasEliminadas);
+            }
+
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            try {
+                // Se devuelve la transacción al estado anterior
+                conexion.rollback();
+
+                System.out.println("Transacción revertida por un error");
+
+            } catch (SQLException rollBackEx) {
+                System.err.println("Error al deshacer la transacción: " + rollBackEx.getMessage());
+            }
+
+            System.out.println("Error al eliminar la fila: " + e.getMessage());
+        } finally {
+            try {
+                // Se restablece el autocommit a true para volver a guardar las transacciones automáticamente
+                conexion.setAutoCommit(true);
+            } catch (SQLException setAutoCommitEx) {
+                System.err.println("Error al restaurar el autocommit: " + setAutoCommitEx.getMessage());
+            }
         }
     }
+
 }
