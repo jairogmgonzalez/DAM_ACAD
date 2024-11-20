@@ -323,9 +323,126 @@ public class JDBC2 {
         }
     }
 
-    // Método que permite insertar un usuario y varias licencias con 1 llamada
-    public boolean insertarLicencias(String DNI, String direccion, String CP, string nombre, ArrayList<> licencias){
-        
+    // Método para insertar un usuario y sus licencias en la base de datos
+    public boolean insertarLicencias(String DNI, String direccion, String CP, String nombre, List<Licencia> licencias) {
+        // Sentencia SQL para insertar un usuario en la tabla
+        String sqlUsuario = "INSERT INTO usuarios (dni, direccion, cp, nombre) VALUES (?,?,?,?)";
+
+        // Sentencia SQL para insertar las licencias del usuario en la tabla
+        String sqlLicencia = "INSERT INTO licencias (id_usuario, tipo, expedicion, caducidad) VALUES (?,?,?)";
+
+        try {
+            // Se establece el autocommit a false para evitar que se guarde la transacción automáticamente
+            conexion.setAutoCommit(false);
+
+            // Variable donde se almacenará el id del usuario
+            int idUsuario = 0;
+
+            // Se crea un PreparedStatement para ejecutar la consulta del usuario
+            try (PreparedStatement psUsuario = conexion.prepareStatement(sqlUsuario)) {
+                // Se establece los valores para los parámetros de la consulta del usuario
+                psUsuario.setString(1, DNI);
+                psUsuario.setString(2, direccion);
+                psUsuario.setString(3, CP);
+                psUsuario.setString(4, nombre);
+
+                // Se ejecuta la consulta del usuario
+                psUsuario.executeUpdate();
+
+                // Se obtiene el id del usuario insertado
+                try (ResultSet rs = psUsuario.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        idUsuario = rs.getInt(1); // Se recupera el ID generado
+                    } else {
+                        throw new SQLException("No se pudo obtener el ID del usuario insertado.");
+                    }
+                }
+            }
+
+            // Se crea un PreparedStatement para ejecutar la consulta de las licencias del usuario
+            try (PreparedStatement psLicencia = conexion.prepareStatement(sqlLicencia)) {
+                // Se establece los valores para los parámetros de la consulta de las licencias
+                for (Licencia licencia : licencias) {
+                    psLicencia.setInt(1, idUsuario);
+                    psLicencia.setString(2, licencia.getTipo());
+                    psLicencia.setTimestamp(3, licencia.getExpedicion());
+                    psLicencia.setTimestamp(4, licencia.getCaducidad());
+
+                    // Se ejecuta la consulta de las licencias
+                    psLicencia.executeUpdate();
+                }
+            }
+
+            // Se confirma la transacción
+            conexion.commit();
+
+            System.out.println("Usuario y licencias insertadas correctamente");
+            return true;
+        } catch (SQLException e) {
+            try {
+                // Se devuelve la transacción al estado anterior
+                conexion.rollback();
+                System.out.println("Transacción revertida por un error");
+            } catch (SQLException rollBackEx) {
+                System.err.println("Error al deshacer la transacción: " + rollBackEx.getMessage());
+            }
+
+            System.out.println("Error con la inserción de datos");
+            return false;
+        } finally {
+            try {
+                // Se restablece el autocommit a true para volver a guardar la transacción automáticamente
+                conexion.setAutoCommit(true);
+            } catch (SQLException setAutoCommitEx) {
+                System.err.println("Error al restaurar el autocommit: " + setAutoCommitEx.getMessage());
+            }
+        }
+    }
+
+    // Método para eliminar todas las licencias de un usuario en la base de datos por su DNI
+    public boolean eliminarLicencias(String DNI) {
+        // Sentencia SQL para eliminar las licencias del usuario
+        String sql = "DELETE FROM licencias WHERE id_usuario IN (SELECT id FROM usuarios WHERE dni =?)";
+
+        try {
+            // Se establece el autocommit a false para evitar que se guarde la transacción automáticamente
+            conexion.setAutoCommit(false);
+
+            // Se crea un PreparedStatement para ejecutar la consulta
+            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+                // Se establece el valor para el parámetro de la consulta
+                ps.setString(1, DNI);
+
+                // Se ejecuta la consulta
+                int licenciasEliminadas = ps.executeUpdate();
+
+                // Se confirma la transacción
+                conexion.commit();
+
+                System.out.println(licenciasEliminadas + " licencias eliminadas correctamente");
+                return true;
+            }
+
+        } catch (SQLException e) {
+            try {
+                // Se devuelve la transacción al estado anterior
+                conexion.rollback();
+                System.out.println("Transacción revertida por un error");
+            } catch (SQLException rollBackEx) {
+                System.err.println("Error al deshacer la transacción: " + rollBackEx.getMessage());
+            }
+
+            System.out.println("Error con la eliminación de licencias");
+            return false;
+            
+        } finally {
+            try {
+                // Se restablece el autocommit a true para volver a guardar la transacción automáticamente
+                conexion.setAutoCommit(true);
+            } catch (SQLException setAutoCommitEx) {
+                System.err.println("Error al restaurar el autocommit: " + setAutoCommitEx.getMessage());
+            }
+        }
     }
 
 }
