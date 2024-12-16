@@ -1,13 +1,13 @@
-package com.webdinamica.web;
+package com.ud5_springboot.tarea3;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WebDinamicaSpringboot1Application {
+public class Tarea3Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WebDinamicaSpringboot1Application.class, args);
+		SpringApplication.run(Tarea3Application.class, args);
 	}
 
 }

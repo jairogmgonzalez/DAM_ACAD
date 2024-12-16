@@ -1,10 +1,10 @@
-package com.webdinamica.web;
+package com.ud5_springboot.tarea1;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class WebDinamicaSpringboot1ApplicationTests {
+class Tarea1ApplicationTests {
 
 	@Test
 	void contextLoads() {

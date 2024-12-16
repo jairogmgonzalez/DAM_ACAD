@@ -37,19 +37,18 @@ public class Pedido {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @OneToMany(mappedBy = "pedido",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "pedido", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
     private Set<PedidoProducto> productosPedido = new HashSet<>();
 
     // Constructor por defecto
-    public Pedido() {}
+    public Pedido() {
+    }
 
     // Constructor por parámetros para los campos no null
     public Pedido(LocalDateTime fecha, String estado, Cliente cliente) {
         this.fecha = fecha;
         this.estado = estado;
-       setCliente(cliente); 
+        setCliente(cliente);
     }
 
     // Métodos adicionales

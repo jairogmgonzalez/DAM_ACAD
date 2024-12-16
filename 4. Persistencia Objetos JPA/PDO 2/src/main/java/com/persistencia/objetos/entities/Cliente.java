@@ -3,6 +3,8 @@ package com.persistencia.objetos.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,10 +30,10 @@ public class Cliente {
     private String email;
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonBackReference
     private Direccion direccion;
 
-    @OneToMany(mappedBy = "cliente",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "cliente", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private Set<Pedido> pedidos = new HashSet<>();
 
     // Constructor por defecto

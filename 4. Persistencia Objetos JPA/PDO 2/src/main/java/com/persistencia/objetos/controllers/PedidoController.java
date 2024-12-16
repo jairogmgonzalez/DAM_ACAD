@@ -27,11 +27,10 @@ public class PedidoController {
     }
 
     // Crea un nuevo pedido
-    @PostMapping
+    @PostMapping("/crear")
     public ResponseEntity<Pedido> crearPedido(@RequestBody Pedido pedido) {
         Pedido nuevoPedido = pedidoRepository.save(pedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPedido);
-
     }
 
     // Obtiene pedidos entre fechas

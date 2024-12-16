@@ -1,5 +1,7 @@
 package com.persistencia.objetos.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,13 +31,15 @@ public class Direccion {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
+    @JsonBackReference
     private Cliente cliente;
 
     // Constructor por defecto
-    public Direccion() {}
+    public Direccion() {
+    }
 
     // Construtor por parámetros completo
-    public Direccion(String calle, String ciudad, Integer codigoPostal, Cliente cliente){
+    public Direccion(String calle, String ciudad, Integer codigoPostal, Cliente cliente) {
         this.calle = calle;
         this.ciudad = ciudad;
         this.codigoPostal = codigoPostal;
@@ -43,51 +47,53 @@ public class Direccion {
     }
 
     // Getters y setters
-    public Long getId(){
+    public Long getId() {
         return this.id;
     }
 
-    public String getCalle(){
+    public String getCalle() {
         return this.calle;
     }
 
-    public void setCalle(String calle){
+    public void setCalle(String calle) {
         this.calle = calle;
     }
 
-    public String getCiudad(){
+    public String getCiudad() {
         return this.ciudad;
     }
 
-    public void setCiudad(String ciudad){
+    public void setCiudad(String ciudad) {
         this.ciudad = ciudad;
     }
 
-    public Integer getCodigoPostal(){
+    public Integer getCodigoPostal() {
         return this.codigoPostal;
     }
 
-    public void setCodigoPostal(Integer codigoPostal){
+    public void setCodigoPostal(Integer codigoPostal) {
         this.codigoPostal = codigoPostal;
     }
 
-    public Cliente getCliente(){
+    public Cliente getCliente() {
         return this.cliente;
     }
 
-    public void setCliente(Cliente cliente){
+    public void setCliente(Cliente cliente) {
         this.cliente = cliente;
 
-        if (cliente != null && cliente.getDireccion() != this){
+        if (cliente != null && cliente.getDireccion() != this) {
             cliente.setDireccion(this);
         }
     }
 
     // Método equals
     @Override
-    public boolean equals(Object other){
-        if (this == other) return true;
-        if (other == null || getClass() != other.getClass()) return false;
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (other == null || getClass() != other.getClass())
+            return false;
 
         Direccion that = (Direccion) other;
         return id.equals(that.id);
@@ -95,8 +101,8 @@ public class Direccion {
 
     // Método hashCode
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return id.hashCode();
     }
-    
+
 }

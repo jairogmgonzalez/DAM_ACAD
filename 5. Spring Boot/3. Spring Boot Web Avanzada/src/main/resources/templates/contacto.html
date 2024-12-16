@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title}">Document</title>
+    <title>Contacto</title>
 </head>
 <body>    
-    <h1 th:text="${title}"> TEXTO </h1>
-    <h2 th:text="${nombre}"></h2>
-    <h3 th:text="${apellido}"></h3>
+    <h1> CONTACTO </h1>
+    <p th:text="'Mensaje: ' + ${mensaje}"></p>
 </body>
 </html>

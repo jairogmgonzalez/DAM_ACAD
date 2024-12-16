@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ud5_springboot</groupId>
-	<artifactId>tarea1</artifactId>
+	<artifactId>tarea3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Tarea1</name>
-	<description>Web dinámica</description>
+	<name>Tarea3</name>
+	<description>Spring Boot Web Avanzada</description>
 	<url/>
 	<licenses>
 		<license/>

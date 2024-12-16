@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+</head>
+<body>
+    <h1>PRODUCTOS</h1>
+    <ul>
+        <li th:each="producto : ${productos}" th:text="${producto.id + ' - ' + producto.nombre + ' - Stock: ' + producto.stock}"></li>
+    </ul>
+
+    <h2>Producto Destacado:</h2>
+        <p>ID: <span th:text="${productoEspecial.id}"></span></p>
+        <p>Nombre: <span th:text="${productoEspecial.nombre}"></span></p>
+        <p>Stock: <span th:text="${productoEspecial.stock}"></span></p>
+
+</body>
+</html>
