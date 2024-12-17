@@ -20,8 +20,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name = "boards")
-public class Board {
+@Table(name = "categories")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,15 +31,12 @@ public class Board {
     @NotBlank
     private String name;
 
-    @Column(name = "description", length = 255)
-    private String description;
-
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Category> categories = new HashSet<Category>();
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Task> tasks = new HashSet<Task>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -48,34 +45,27 @@ public class Board {
     private LocalDateTime updatedAt;
 
     // Constructor por defecto
-    public Board() {
-    }
-
-    // Constructor por parámetros para los campos obligatorios
-    public Board(String name, User user) {
-        this.name = name;
-        this.user = user;
+    public Category() {
     }
 
     // Constructor por parámetros completo
-    public Board(String name, String description, User user) {
+    public Category(String name, Board board) {
         this.name = name;
-        this.description = description;
-        this.user = user;
+        this.board = board;
     }
 
-    // Métodos adicioanles
-    public void addCategory(Category category) {
-        if (!categories.contains(category)) {
-            categories.add(category);
-            category.setBoard(this);
+    // Métodos adicionales
+    public void addTask(Task task) {
+        if (!tasks.contains(task)) {
+            tasks.add(task);
+            task.setCategory(this);
         }
     }
 
-    public void removeCategory(Category category) {
-        if (categories.contains(category)) {
-            categories.remove(category);
-            category.setBoard(null);
+    public void removeTask(Task task) {
+        if (tasks.contains(task)) {
+            tasks.remove(task);
+            task.setCategory(null);
         }
     }
 
@@ -96,36 +86,28 @@ public class Board {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public Board getBoard() {
+        return board;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public void setBoard(Board board) {
+        this.board = board;
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-
-        if (user != null && !user.getBoards().contains(this)) {
-            user.addBoard(this);
+        if (board != null && !board.getCategories().contains(this)) {
+            board.addCategory(this);
         }
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Set<Task> getTasks() {
+        return tasks;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories.clear();
+    public void setTasks(Set<Task> tasks) {
+        this.tasks.clear();
 
-        if (categories != null) {
-            for (Category category : categories) {
-                addCategory(category);
+        if (tasks != null) {
+            for (Task t : tasks) {
+                addTask(t);
             }
         }
     }
@@ -151,12 +133,11 @@ public class Board {
     // Método toString
     @Override
     public String toString() {
-        return "Board{" +
+        return "Category {" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", userId=" + (user != null ? user.getId() : null) +
-                '}';
+                ", name='" + name + "'" +
+                ", boardId=" + (board != null ? board.getId() : null) +
+                "}";
     }
 
     // Método equals
@@ -167,7 +148,7 @@ public class Board {
         if (other == null || getClass() != other.getClass())
             return false;
 
-        Board that = (Board) other;
+        Category that = (Category) other;
         return Objects.equals(id, that.id);
     }
 

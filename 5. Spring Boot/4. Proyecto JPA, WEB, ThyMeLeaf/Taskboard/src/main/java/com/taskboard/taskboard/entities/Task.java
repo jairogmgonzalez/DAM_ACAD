@@ -1,27 +1,37 @@
 package com.taskboard.taskboard.entities;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name = "boards")
-public class Board {
+@Table(name = "tasks")
+public class Task {
+
+    public enum TaskStatus {
+        PENDING,
+        IN_PROGRESS,
+        COMPLETED
+    }
+
+    public enum TaskPriority {
+        LOW,
+        MEDIUM,
+        HIGH
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,12 +44,17 @@ public class Board {
     @Column(name = "description", length = 255)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private TaskStatus status;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Category> categories = new HashSet<Category>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority")
+    private TaskPriority priority;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -48,35 +63,22 @@ public class Board {
     private LocalDateTime updatedAt;
 
     // Constructor por defecto
-    public Board() {
+    public Task() {
     }
 
     // Constructor por parámetros para los campos obligatorios
-    public Board(String name, User user) {
+    public Task(String name, Category category) {
         this.name = name;
-        this.user = user;
+        this.category = category;
     }
 
     // Constructor por parámetros completo
-    public Board(String name, String description, User user) {
+    public Task(String name, String description, TaskStatus status, TaskPriority priority, Category category) {
         this.name = name;
         this.description = description;
-        this.user = user;
-    }
-
-    // Métodos adicioanles
-    public void addCategory(Category category) {
-        if (!categories.contains(category)) {
-            categories.add(category);
-            category.setBoard(this);
-        }
-    }
-
-    public void removeCategory(Category category) {
-        if (categories.contains(category)) {
-            categories.remove(category);
-            category.setBoard(null);
-        }
+        this.status = status;
+        this.priority = priority;
+        this.category = category;
     }
 
     // Getters y setters
@@ -104,29 +106,31 @@ public class Board {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
+    public TaskStatus getStatus() {
+        return status;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-
-        if (user != null && !user.getBoards().contains(this)) {
-            user.addBoard(this);
-        }
+    public void setStatus(TaskStatus status) {
+        this.status = status;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public TaskPriority getPriority() {
+        return priority;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories.clear();
+    public void setPriority(TaskPriority priority) {
+        this.priority = priority;
+    }
 
-        if (categories != null) {
-            for (Category category : categories) {
-                addCategory(category);
-            }
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+
+        if (category != null && !category.getTasks().contains(this)) {
+            category.addTask(this);
         }
     }
 
@@ -151,11 +155,14 @@ public class Board {
     // Método toString
     @Override
     public String toString() {
-        return "Board{" +
+        return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", userId=" + (user != null ? user.getId() : null) +
+                ", status=" + status +
+                ", priority=" + priority +
+                ", categoryId=" + (category != null ? category.getId() : null) +
+                ", categoryName=" + (category != null ? category.getName() : null) +
                 '}';
     }
 
@@ -167,7 +174,7 @@ public class Board {
         if (other == null || getClass() != other.getClass())
             return false;
 
-        Board that = (Board) other;
+        Task that = (Task) other;
         return Objects.equals(id, that.id);
     }
 
@@ -176,5 +183,4 @@ public class Board {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }
