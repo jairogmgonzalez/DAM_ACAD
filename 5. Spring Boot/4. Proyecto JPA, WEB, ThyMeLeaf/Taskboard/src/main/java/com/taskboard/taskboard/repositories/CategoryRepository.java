@@ -17,43 +17,31 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    // Búsqueda por campos específicos
-    Optional<Category> findByName(String name);
+        // Búsqueda por campos específicos
+        Optional<Category> findByName(String name);
 
-    List<Category> findByBoardId(Long boardId);
+        List<Category> findByBoardId(Long boardId);
 
-    // Busca categorías que tienen tareas creadas
-    @Query("SELECT c FROM Category c WHERE c.tasks IS NOT EMPTY")
-    List<Category> findCategoriesWithTasks();
+        // Busca categorías que tienen tareas asociadas
+        @Query("SELECT c FROM Category c WHERE c.tasks IS NOT EMPTY")
+        List<Category> findCategoriesWithTasks();
 
-    // Cuenta las tareas asociadas a una categoría
-    @Query(value = "SELECT COUNT(*) FROM tasks WHERE category_id = :categoryId", nativeQuery = true)
-    long countTasksByCategoryId(@Param("categoryId") Long categoryId);
+        // Busca categorías que no tienen tareas asociadas
+        @Query("SELECT c FROM Category c WHERE c.tasks IS EMPTY")
+        List<Category> findCategoriesWithoutTasks();
 
-    // Busca categorías por nombre o que contengan ciertas palabras
-    @Query("SELECT c FROM Category c WHERE c.name LIKE :term")
-    List<Category> findByNameContaining(@Param("term") String searchTerm);
+        // Cuenta las categorías que tiene un tablero
+        @Query(value = "SELECT COUNT(*) FROM categories c WHERE c.board_id = :boardId", nativeQuery = true)
+        Long countCategoriesByBoardId(@Param("boardId") Long boardId);
 
-    // Cuenta las categorías que no tienen tareas asociadas
-    @Query(value = "SELECT COUNT(*) FROM categories c " +
-            "LEFT JOIN tasks t ON c.id = t.category_id " +
-            "WHERE t.id IS NULL", nativeQuery = true)
-    Long countCategoriesWithoutTasks();
+        // Busca categorías creadas después de una fecha
+        @Query("SELECT c FROM Category c WHERE c.createdAt > :date")
+        List<Category> findCategoriesCreatedAfter(@Param("date") LocalDateTime date);
 
-    // Busca las categorías creadas antes de una fecha específica
-    @Query("SELECT c FROM Category c WHERE c.createdAt < :date")
-    List<Category> findCategoriesCreatedBefore(@Param("date") LocalDateTime date);
-
-    // Busca categorías con tareas de alta prioridad
-    @Query("SELECT DISTINCT c FROM Category c " +
-            "JOIN c.tasks t " +
-            "WHERE t.priority = 'HIGH'")
-    List<Category> findCategoriesWithHighPriorityTasks();
-
-    // Actualiza el nombre de una categoría
-    @Modifying
-    @Transactional
-    @Query("UPDATE Category c SET c.name = :newName WHERE c.id = :categoryId")
-    int updateCategoryName(@Param("categoryId") Long categoryId, @Param("newName") String newName);
+        // Actualiza el nombre de una categoría
+        @Modifying
+        @Transactional
+        @Query("UPDATE Category c SET c.name = :newName WHERE c.id = :id")
+        int updateCategoryName(@Param("id") Long id, @Param("newName") String newName);
 
 }

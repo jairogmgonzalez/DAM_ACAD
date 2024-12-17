@@ -19,59 +19,46 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    // Búsqueda por campos específicos
-    Optional<Task> findByName(String name);
+        // Búsqueda por campos específicos
+        Optional<Task> findByName(String name);
 
-    List<Task> findByCategoryId(Long categoryId);
+        List<Task> findByCategoryId(Long categoryId);
 
-    // Búsquedas por estado y prioridad
-    List<Task> findByStatus(TaskStatus status);
+        // Búsquedas por estado y prioridad
+        List<Task> findByStatus(TaskStatus status);
 
-    List<Task> findByPriority(TaskPriority priority);
+        List<Task> findByPriority(TaskPriority priority);
 
-    // Búsquedas combinadas por campos específicos
-    List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority);
+        // Busca las tareas más recientes ordenadas por fecha
+        @Query("SELECT t FROM Task t ORDER BY t.createdAt DESC")
+        List<Task> findLatestTasks();
 
-    List<Task> findByCategoryIdAndStatus(Long categoryId, TaskStatus status);
+        // Cuenta tareas por estado en una categoría específica
+        @Query(value = "SELECT COUNT(*) FROM tasks " +
+                        "WHERE category_id = :categoryId AND status = :status", nativeQuery = true)
+        long countTasksByCategoryAndStatus(@Param("categoryId") Long categoryId,
+                        @Param("status") String status);
 
-    // Busca tareas por coincidencia en el nombre o descripción
-    @Query("SELECT t FROM Task t WHERE t.name LIKE :term OR t.description LIKE :term")
-    List<Task> findByNameOrDescriptionContaining(@Param("term") String searchTerm);
+        // Busca tareas de alta prioridad pendientes
+        @Query("SELECT t FROM Task t " +
+                        "WHERE t.status = 'PENDING' AND t.priority = 'HIGH' " +
+                        "ORDER BY t.createdAt DESC")
+        List<Task> findHighPriorityPendingTasks();
 
-    // Cuenta tareas por estado en una categoría específica
-    @Query(value = "SELECT COUNT(*) FROM tasks " +
-            "WHERE category_id = :categoryId AND status = :status", nativeQuery = true)
-    long countTasksByCategoryAndStatus(@Param("categoryId") Long categoryId,
-            @Param("status") String status);
+        // Busca tareas creadas en un rango de fechas
+        @Query("SELECT t FROM Task t " +
+                        "WHERE t.createdAt BETWEEN :startDate AND :endDate")
+        List<Task> findTasksCreatedBetweenDates(@Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 
-    // Busca tareas de alta prioridad pendientes
-    @Query("SELECT t FROM Task t " +
-            "WHERE t.status = 'PENDING' AND t.priority = 'HIGH' " +
-            "ORDER BY t.createdAt DESC")
-    List<Task> findHighPriorityPendingTasks();
+        // Cuenta las tareas asociadas a una categoría
+        @Query(value = "SELECT COUNT(*) FROM tasks t WHERE t.category_id = :categoryId", nativeQuery = true)
+        Long countTasksByCategoryId(@Param("categoryId") Long categoryId);
 
-    // Actualiza el estado de una tarea
-    @Modifying
-    @Transactional
-    @Query("UPDATE Task t SET t.status = :newStatus WHERE t.id = :taskId")
-    int updateTaskStatus(@Param("taskId") Long taskId,
-            @Param("newStatus") TaskStatus newStatus);
-
-    // Busca tareas creadas en un rango de fechas
-    @Query("SELECT t FROM Task t " +
-            "WHERE t.createdAt BETWEEN :startDate AND :endDate")
-    List<Task> findTasksCreatedBetweenDates(@Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
-
-    // Busca tareas más antiguas que cierta fecha y con cierto estado
-    @Query("SELECT t FROM Task t " +
-            "WHERE t.createdAt < :date AND t.status = :status")
-    List<Task> findOldTasksByStatus(@Param("date") LocalDateTime date,
-            @Param("status") TaskStatus status);
-
-    // Busca tareas por categoría ordenadas por prioridad y fecha
-    @Query("SELECT t FROM Task t " +
-            "WHERE t.category.id = :categoryId " +
-            "ORDER BY t.priority DESC, t.createdAt DESC")
-    List<Task> findTasksByCategoryOrderByPriorityAndDate(@Param("categoryId") Long categoryId);
+        // Actualiza el estado de una tarea
+        @Modifying
+        @Transactional
+        @Query("UPDATE Task t SET t.status = :newStatus WHERE t.id = :taskId")
+        int updateTaskStatus(@Param("taskId") Long taskId,
+                        @Param("newStatus") TaskStatus newStatus);
 }
