@@ -3,6 +3,7 @@ package com.taskboard.taskboard.entities;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -52,6 +53,7 @@ public class Task {
     @Column(name = "priority")
     private TaskPriority priority;
 
+    @JsonIgnoreProperties("tasks")
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;

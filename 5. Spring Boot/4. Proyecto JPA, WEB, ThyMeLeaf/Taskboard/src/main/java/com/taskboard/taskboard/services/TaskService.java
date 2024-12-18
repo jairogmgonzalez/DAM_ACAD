@@ -29,18 +29,17 @@ public class TaskService {
     }
 
     // Obtiene todas las tareas
-    public Iterable<Task> getAllTasks() {
+    public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
     // Obtiene una tarea por su nombre
-    public Task getTaskByName(String name) {
+    public List<Task> getTaskByName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
 
-        return taskRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada con nombre: " + name));
+        return taskRepository.findByName(name);
     }
 
     // Obtiene todas las categorías que pertenezcan a una categoría por su id
@@ -66,7 +65,7 @@ public class TaskService {
     }
 
     // Cuenta cuántas tareas por estado hay en una categoría específica
-    public Long getCountTasksByCategoryAndStatus(Long categoryId, String status) {
+    public Long getCountTasksByCategoryAndStatus(Long categoryId, TaskStatus status) {
         categoryService.getCategoryById(categoryId);
 
         if (status == null) {
@@ -77,8 +76,8 @@ public class TaskService {
     }
 
     // Obtiene todas las tareas de alta prioridad pendientes
-    public List<Task> getHighPriorityPendingTasks() {
-        return taskRepository.findHighPriorityPendingTasks();
+    public List<Task> getHighPriorityTasks() {
+        return taskRepository.findHighPriorityTasks();
     }
 
     // Obtiene todas las tareas creadas en un rango de fechas

@@ -33,13 +33,12 @@ public class BoardService {
     }
 
     // Busca un tablero por su nombre
-    public Board getBoardByName(String name) {
+    public List<Board> getBoardsByName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
 
-        return boardRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Tablero no encontrado con nombre: " + name));
+        return boardRepository.findByName(name);
     }
 
     // Busca un tablero por el id de usuario
@@ -55,7 +54,6 @@ public class BoardService {
             throw new IllegalArgumentException("La fecha no puede ser nula");
         }
         return boardRepository.findBoardsCreatedAfter(date);
-
     }
 
     // Cuenta los tableros que tienen descripcion
@@ -121,9 +119,11 @@ public class BoardService {
         if (board.getName() != null) {
             existingBoard.setName(board.getName());
         }
+
         if (board.getDescription() != null) {
             existingBoard.setDescription(board.getDescription());
         }
+
         if (board.getUser() != null) {
             existingBoard.setUser(board.getUser());
         }

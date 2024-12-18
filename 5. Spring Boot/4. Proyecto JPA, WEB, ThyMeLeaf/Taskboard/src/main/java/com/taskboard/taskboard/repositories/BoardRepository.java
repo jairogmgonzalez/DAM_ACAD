@@ -18,7 +18,7 @@ import jakarta.transaction.Transactional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
         // Búsqueda por campos específicos
-        Optional<Board> findByName(String name);
+        List<Board> findByName(String name);
 
         List<Board> findByUserId(Long userId);
 
@@ -30,11 +30,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
         @Query("SELECT COUNT(b) FROM Board b WHERE b.description IS NOT NULL")
         Long countBoardsWithDescription();
 
-        // Busca tableros que tienen al menos x categorías
-        @Query(value = "SELECT * FROM boards b " +
-                        "JOIN categories c ON b.id = c.board_id " +
-                        "GROUP BY b.id " +
-                        "HAVING COUNT(c.id) >= :minCategories", nativeQuery = true)
+        @Query(value = "SELECT b.id, b.name, b.description, b.user_id, b.created_at, b.updated_at " +
+                "FROM boards b " +
+                "JOIN categories c ON b.id = c.board_id " +
+                "GROUP BY b.id, b.name, b.description, b.user_id, b.created_at, b.updated_at " +
+                "HAVING COUNT(c.id) >= :minCategories", nativeQuery = true)
         List<Board> findBoardsWithMinCategories(@Param("minCategories") Long minCategories);
 
         // Busca tableros con más de x tareas

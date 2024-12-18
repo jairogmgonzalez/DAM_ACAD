@@ -20,7 +20,7 @@ import jakarta.transaction.Transactional;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
         // Búsqueda por campos específicos
-        Optional<Task> findByName(String name);
+        List<Task> findByName(String name);
 
         List<Task> findByCategoryId(Long categoryId);
 
@@ -37,13 +37,13 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         @Query(value = "SELECT COUNT(*) FROM tasks " +
                         "WHERE category_id = :categoryId AND status = :status", nativeQuery = true)
         long countTasksByCategoryAndStatus(@Param("categoryId") Long categoryId,
-                        @Param("status") String status);
+                        @Param("status") TaskStatus status);
 
         // Busca tareas de alta prioridad pendientes
         @Query("SELECT t FROM Task t " +
-                        "WHERE t.status = 'PENDING' AND t.priority = 'HIGH' " +
+                        "WHERE t.priority = 'HIGH' " +
                         "ORDER BY t.createdAt DESC")
-        List<Task> findHighPriorityPendingTasks();
+        List<Task> findHighPriorityTasks();
 
         // Busca tareas creadas en un rango de fechas
         @Query("SELECT t FROM Task t " +

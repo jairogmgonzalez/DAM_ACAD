@@ -33,17 +33,16 @@ public class CategoryService {
     }
 
     // Obtiene una categoría por su nombre
-    public Category findByName(String name) {
+    public List<Category> getCategoriesByName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
 
-        return categoryRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con nombre: " + name));
+        return categoryRepository.findByName(name);
     }
 
     // Obtiene todas las categoría que pertenecen a un tablero
-    public List<Category> findByBoardId(Long boardId) {
+    public List<Category> getCategoriesByBoardId(Long boardId) {
         boardService.getBoardById(boardId);
 
         return categoryRepository.findByBoardId(boardId);
@@ -127,14 +126,14 @@ public class CategoryService {
 
     // Métodos adicionales para gestión de tareas
     @Transactional
-    public Category addTaskToCategory(Long categoryId, Task task) {
+    public Category addTask(Long categoryId, Task task) {
         Category category = getCategoryById(categoryId);
         category.addTask(task);
         return categoryRepository.save(category);
     }
 
     @Transactional
-    public Category removeTaskFromCategory(Long categoryId, Task task) {
+    public Category removeTask(Long categoryId, Task task) {
         Category category = getCategoryById(categoryId);
         category.removeTask(task);
         return categoryRepository.save(category);

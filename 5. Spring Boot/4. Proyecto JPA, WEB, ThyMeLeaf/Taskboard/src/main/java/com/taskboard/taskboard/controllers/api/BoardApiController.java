@@ -17,12 +17,12 @@ public class BoardApiController {
     private BoardService boardService;
 
     @PostMapping("/create")
-    public Board createBoard(Board board) {
+    public Board createBoard(@RequestBody Board board) {
         return boardService.createBoard(board);
     }
 
     @PutMapping("/update")
-    public Board updateBoard(Board board) {
+    public Board updateBoard(@RequestBody Board board) {
         return boardService.updateBoard(board);
     }
 
@@ -31,14 +31,14 @@ public class BoardApiController {
         boardService.updateBoardName(id, newName);
     }
 
-    @PostMapping("/{boardId}/categories/add")
-    public Board addCategory(@PathVariable Long boardId, @RequestBody Category category) {
-        return boardService.addCategoryToBoard(boardId, category);
+    @PostMapping("/{id}/categories/add")
+    public Board addCategory(@PathVariable("id") Long id, @RequestBody Category category) {
+        return boardService.addCategoryToBoard(id, category);
     }
 
-    @DeleteMapping("/{boardId}/categories/remove")
-    public Board removeCategory(@PathVariable Long boardId, @RequestBody Category category) {
-        return boardService.removeCategoryFromBoard(boardId, category);
+    @DeleteMapping("/{id}/categories/remove")
+    public Board removeCategory(@PathVariable("id") Long id, @RequestBody Category category) {
+        return boardService.removeCategoryFromBoard(id, category);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -57,12 +57,12 @@ public class BoardApiController {
     }
 
     @GetMapping("/by-name")
-    public Board getBoardsByName(@RequestParam("name") String name) {
-        return boardService.getBoardByName(name);
+    public List<Board> getBoardsByName(@RequestParam("name") String name) {
+        return boardService.getBoardsByName(name);
     }
 
-    @GetMapping("/by-userid/{id}")
-    public List<Board> getBoardsByUserid(@PathVariable("userId") Long userId) {
+    @GetMapping("/by-userid/{userId}")
+    public List<Board> getBoardsByUserId(@PathVariable("userId") Long userId) {
         return boardService.getBoardsByUserId(userId);
     }
 
@@ -72,7 +72,7 @@ public class BoardApiController {
     }
 
     @GetMapping("/count-with-desc")
-    public Long getBoardsCountWithDesc(@RequestParam("date") LocalDateTime date) {
+    public Long getBoardsCountWithDesc() {
         return boardService.countBoardsWithDescription();
     }
 
@@ -87,7 +87,7 @@ public class BoardApiController {
     }
 
     @GetMapping("/without-categories")
-    public List<Board> getBoardsWithoutCategories(@RequestParam("minCategories") Long minCategories) {
+    public List<Board> getBoardsWithoutCategories() {
         return boardService.getBoardsWithoutCategories();
     }
 
@@ -95,8 +95,5 @@ public class BoardApiController {
     public Long getBoardsCountByUserid(@PathVariable("id") Long userId) {
         return boardService.countBoardsByUserId(userId);
     }
-
-
-
 
 }

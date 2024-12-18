@@ -2,7 +2,6 @@ package com.taskboard.taskboard.controllers.api;
 
 import com.taskboard.taskboard.entities.User;
 import com.taskboard.taskboard.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
