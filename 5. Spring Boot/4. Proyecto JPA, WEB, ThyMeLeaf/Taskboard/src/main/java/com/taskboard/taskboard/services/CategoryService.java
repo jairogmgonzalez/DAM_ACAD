@@ -10,7 +10,9 @@ import com.taskboard.taskboard.entities.Task;
 import com.taskboard.taskboard.repositories.CategoryRepository;
 
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CategoryService {
 
     @Autowired

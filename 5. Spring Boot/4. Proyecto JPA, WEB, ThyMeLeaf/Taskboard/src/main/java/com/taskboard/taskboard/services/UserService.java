@@ -67,7 +67,7 @@ public class UserService {
     }
 
     // Obtiene los nombres de usuarios con más de x tableros
-    public List<String> getUsersWithMoreThanXBoards(Long minBoards) {
+    public List<String> getUsersNamesWithMoreThanXBoards(Long minBoards) {
         if (minBoards < 0) {
             throw new IllegalArgumentException("El número mínimo de tableros no puede ser negativo");
         }
@@ -86,8 +86,6 @@ public class UserService {
     public List<User> getUsersWithLongestName() {
         return userRepository.findUsersWithLongestName();
     }
-
-    // Operaciones CRUD principales
 
     // Crea un usuario y lo guarda en la base de datos
     @Transactional

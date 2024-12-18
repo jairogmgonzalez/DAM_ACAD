@@ -27,11 +27,9 @@ public class User {
     private Long id;
 
     @Column(name = "name", length = 50, nullable = false, unique = true)
-    @NotBlank
     private String name;
 
     @Column(name = "email", length = 120, nullable = false, unique = true)
-    @Email
     private String email;
 
     // Relación uno a muchos con Board

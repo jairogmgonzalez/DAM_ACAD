@@ -43,18 +43,18 @@ public class BoardService {
     }
 
     // Busca un tablero por el id de usuario
-    public List<Board> getBoardByUserId(Long userId) {
+    public List<Board> getBoardsByUserId(Long userId) {
         userService.getUserById(userId);
 
         return boardRepository.findByUserId(userId);
     }
 
     // Busca tableros creados después de una fecha determinada
-    public List<Board> getBoardsCreatedAfter(LocalDateTime fecha) {
-        if (fecha == null) {
+    public List<Board> getBoardsCreatedAfter(LocalDateTime date) {
+        if (date == null) {
             throw new IllegalArgumentException("La fecha no puede ser nula");
         }
-        return boardRepository.findBoardsCreatedAfter(fecha);
+        return boardRepository.findBoardsCreatedAfter(date);
 
     }
 
