@@ -32,6 +32,9 @@ public class Category {
     @NotBlank
     private String name;
 
+    @Column(name = "description", length = 255)
+    private String description;
+
     @JsonIgnoreProperties("categories")
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
@@ -41,10 +44,10 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Task> tasks = new HashSet<Task>();
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false, updatable = true)
     private LocalDateTime updatedAt;
 
     // Constructor por defecto
@@ -72,7 +75,9 @@ public class Category {
         }
     }
 
-    // Getters y setters
+    /**
+     * GETTERS Y SETTERS
+     */
     public Long getId() {
         return id;
     }
@@ -84,6 +89,10 @@ public class Category {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 
     public Board getBoard() {
         return board;

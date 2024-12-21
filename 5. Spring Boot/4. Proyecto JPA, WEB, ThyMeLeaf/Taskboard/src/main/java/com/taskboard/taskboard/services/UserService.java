@@ -1,6 +1,5 @@
 package com.taskboard.taskboard.services;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,69 +21,30 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
     }
 
-    // Obtiene todos los usuarios
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
     // Busca un usuario por su nombre
-    public User getUserByName(String name) {
-        validateName(name);
+    public User getUserByUsername(String username) {
+        validateUsername(username);
 
-        return userRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con nombre: " + name));
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + username));
     }
 
     // Busca un usuario por su email
     public User getUserByEmail(String email) {
         validateEmail(email);
+
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
     }
 
-    // Cuenta cuántos usuarios hay en el sistema
-    public long getCountUsers() {
-        return userRepository.countUsers();
+    // Valida si existe un usuario por un nombre de usuario
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
-    // Busca usuarios cuyo nombre contenga una palabra clave
-    public List<User> getUsersByNameContains(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            throw new IllegalArgumentException("La palabra clave proporcionada no es válida");
-        }
-
-        return userRepository.searchByNameContaining(keyword.toLowerCase());
-    }
-
-    // Busca usuarios que tienen tableros
-    public List<User> getUsersWithBoards() {
-        return userRepository.findUsersWithBoards();
-    }
-
-    // Busca usuarios que no tienen tableros
-    public List<User> getUsersWithoutBoards() {
-        return userRepository.findUsersWithoutBoards();
-    }
-
-    // Obtiene los nombres de usuarios con más de x tableros
-    public List<String> getUsersNamesWithMoreThanXBoards(Long minBoards) {
-        if (minBoards < 0) {
-            throw new IllegalArgumentException("El número mínimo de tableros no puede ser negativo");
-        }
-        return userRepository.findUsersWithMoreThanXBoards(minBoards);
-    }
-
-    // Obtiene todos los usuarios cuyo email tiene un dominio específico
-    public List<User> getUsersByEmailDomain(String domain) {
-        if (domain == null || domain.trim().isEmpty() || !domain.startsWith("@")) {
-            throw new IllegalArgumentException("El dominio proporcionado no es válido");
-        }
-        return userRepository.findUsersByEmailDomain(domain);
-    }
-
-    // Obtiene los usuarios con el nombre más largo
-    public List<User> getUsersWithLongestName() {
-        return userRepository.findUsersWithLongestName();
+    // Valida si existe un usuario por un email
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     // Crea un usuario y lo guarda en la base de datos
@@ -95,7 +55,9 @@ public class UserService {
         }
 
         validateUserFields(user);
-        checkEmailUnique(user.getEmail());
+        if (existsByUsername(user.getUsername()) || existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Ya existe un usuario con ese nombre o email");
+        }
 
         return userRepository.save(user);
     }
@@ -103,15 +65,23 @@ public class UserService {
     // Actualiza un usuario existente en la base de datos
     @Transactional
     public User updateUser(User user) {
-        User existingUser = getUserById(user.getId());
-
         validateUserFields(user);
 
-        if (!user.getEmail().equals(existingUser.getEmail())) {
-            checkEmailUnique(user.getEmail());
+        User existingUser = getUserById(user.getId());
+
+        if (!user.getUsername().equals(existingUser.getUsername())) {
+            if (existsByUsername(user.getUsername())) {
+                throw new RuntimeException("Ya existe un usuario con ese nombre");
+            }
         }
 
-        existingUser.setName(user.getName());
+        if (!user.getEmail().equals(existingUser.getEmail())) {
+            if (existsByEmail(user.getEmail())) {
+                throw new RuntimeException("Ya existe un usuario con ese email");
+            }
+        }
+
+        existingUser.setUsername(user.getUsername());
         existingUser.setEmail(user.getEmail());
 
         return userRepository.save(existingUser);
@@ -119,13 +89,41 @@ public class UserService {
 
     // Actualiza el nombre de un usuario
     @Transactional
-    public void updateUserName(Long id, String newName) {
-        validateName(newName);
-        getUserById(id);
+    public void updateUsername(Long id, String newUsername) {
+        validateUsername(newUsername);
 
-        int updatedRows = userRepository.updateUserName(id, newName);
+        User existingUser = getUserById(id);
+
+        if (!newUsername.equals(existingUser.getUsername())) {
+            if (existsByUsername(newUsername)) {
+                throw new RuntimeException("Ya existe un usuario con ese nombre");
+            }
+        }
+
+        int updatedRows = userRepository.updateUsername(id, newUsername);
+
         if (updatedRows == 0) {
-            throw new RuntimeException("No se pudo actualizar el nombre del usuario");
+            throw new RuntimeException("No se pudo actualizar el nombre");
+        }
+    }
+
+    // Actualiza el email de un usuario
+    @Transactional
+    public void updateEmail(Long id, String newEmail) {
+        validateEmail(newEmail);
+
+        User existingUser = getUserById(id);
+
+        if (!newEmail.equals(existingUser.getEmail())) {
+            if (existsByEmail(newEmail)) {
+                throw new RuntimeException("Ya existe un usuario con ese email");
+            }
+        }
+
+        int updatedRows = userRepository.updateEmail(id, newEmail);
+
+        if (updatedRows == 0) {
+            throw new RuntimeException("No se pudo actualizar el email");
         }
     }
 
@@ -140,13 +138,16 @@ public class UserService {
 
     // Métodos privados de validación
     private void validateUserFields(User user) {
-        validateName(user.getName());
+        validateUsername(user.getUsername());
         validateEmail(user.getEmail());
     }
 
-    private void validateName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
+    private void validateUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de usuario no puede estar vacío");
+        }
+        if (username.length() < 3) {
+            throw new IllegalArgumentException("El nombre de usuario debe tener al menos 3 caracteres");
         }
     }
 
@@ -154,12 +155,11 @@ public class UserService {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("El email no puede estar vacío");
         }
-    }
-
-    private void checkEmailUnique(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con ese email");
+        if (!email.contains("@") || !email.contains(".")) {
+            throw new IllegalArgumentException("Formato de email inválido");
         }
     }
 
+
 }
+

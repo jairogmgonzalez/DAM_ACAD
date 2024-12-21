@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/4. Proyecto JPA, WEB, ThyMeLeaf.iml" filepath="$PROJECT_DIR$/.idea/4. Proyecto JPA, WEB, ThyMeLeaf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Taskboard/taskboard.iml" filepath="$PROJECT_DIR$/Taskboard/taskboard.iml" />
     </modules>
   </component>
 </project>

@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -27,34 +28,37 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", length = 50, nullable = false, unique = true)
-    private String name;
+    @Column(name = "username", length = 50, nullable = false, unique = true)
+    private String username;
 
     @Column(name = "email", length = 120, nullable = false, unique = true)
     private String email;
 
-    // Relación uno a muchos con Board
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Board> boards = new HashSet<Board>();
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false, updatable = true)
     private LocalDateTime updatedAt;
 
-    // Constructor por defecto
     public User() {
     }
 
-    // Constructor por parámetros para los campos obligatorios
-    public User(String name, String email) {
-        this.name = name;
+    public User(String username, String email) {
+        this.username = username;
         this.email = email;
     }
 
-    // Métodos adicionales
+
+    public User(String username, String email, Set<Board> boards) {
+        this.username = username;
+        this.email = email;
+        this.boards = boards;
+    }
+
     public void addBoard(Board board) {
         boards.add(board);
         board.setUser(this);
@@ -65,17 +69,23 @@ public class User {
         board.setUser(null);
     }
 
-    // Getters y setters
+    /**
+     * GETTERS Y SETTERS
+     */
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -125,7 +135,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Nueva Categoría - TaskBoard</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        .create-category-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #24292e;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .primary-button {
+            background-color: #0079bf;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .secondary-button {
+            background-color: #f6f8fa;
+            color: #24292e;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link {
+            color: #0366d6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="create-category-container">
+    <div class="form-header">
+        <h2>Crear Nueva Categoría</h2>
+        <a href="/" class="back-link">← Volver</a>
+    </div>
+
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <form th:action="@{/categories/{boardId}/add(boardId=${board.id})}" method="POST">
+        <div class="form-group">
+            <label for="name">Nombre de la categoría *</label>
+            <input type="text" id="name" name="name" required
+                   placeholder="Ej: Unidad 1">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description"
+                      placeholder="Añade una descripción de la categoría..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="primary-button">
+                Crear Categoría
+            </button>
+            <a th:href="@{/boards/{boardId}(boardId=${board.id})}" class="secondary-button">
+                Cancelar
+            </a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

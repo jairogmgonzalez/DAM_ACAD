@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>TaskBoard Proyecto</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        header {
+            background-color: #026aa7;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-nav {
+            margin-right: 1rem;
+        }
+
+        .button {
+            background-color: #0079bf;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background-color: #026aa7;
+            color: white;
+        }
+
+        .boards-section {
+            padding: 2rem;
+        }
+
+        .empty-boards {
+            padding: 1rem;
+        }
+
+        .empty-boards a {
+            padding: 10px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .boards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .board-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 200px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .board-content {
+            flex: 1;
+        }
+
+        .board-title {
+            font-size: 1.5rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .board-description {
+            color: #666;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .board-actions {
+            margin-top: auto;
+            text-align: right;
+        }
+
+        /* Styles for the "New Board" card */
+        .new-board {
+            background-color: #f0f0f0;
+            border: 2px dashed #ccc;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .new-board:hover {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+
+        .plus-icon {
+            font-size: 4rem;
+            color: #666;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .board-card-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 th:text="'BIENVENIDO ' + ${user.username.toUpperCase()}"></h1>
+    <nav class="header-nav">
+        <a th:href="@{/user/{id}(id=${user.id})}" class="button">Mi Perfil</a>
+    </nav>
+</header>
+
+<main>
+    <section class="boards-section">
+        <h2>Mis tableros</h2>
+
+        <div th:if="${#lists.isEmpty(boards)}" class="empty-boards">
+            <p>Aún no tienes tableros. <a href="/boards/add">¡Crea uno para empezar!</a> </p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(boards)}" class="boards-container">
+            <div th:each="board : ${boards}" class="board-card">
+                <div class="board-content">
+                    <h3 class="board-title" th:text="${board.name}">Tablero 1</h3>
+                    <p class="board-description" th:text="${board.description}">Descripción del tablero</p>
+                </div>
+                <div class="board-actions">
+                    <a th:href="@{/boards/{boardId}/update(boardId=${board.id})}" class="button">Opciones</a>
+                    <a th:href="@{/boards/{boardId}(boardId=${board.id})}" class="button">Ver Tablero</a>
+                </div>
+            </div>
+
+            <div class="board-card new-board">
+                <div class="add-board-content">
+                    <span class="plus-icon">+</span>
+                    <p>Crear nuevo tablero</p>
+                </div>
+                <a href="/boards/add" class="board-card-link"></a>
+            </div>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

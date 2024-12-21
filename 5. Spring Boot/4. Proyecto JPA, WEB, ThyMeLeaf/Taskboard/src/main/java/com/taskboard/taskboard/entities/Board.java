@@ -44,10 +44,10 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> categories = new HashSet<Category>();
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false, updatable = true)
     private LocalDateTime updatedAt;
 
     // Constructor por defecto
@@ -82,7 +82,9 @@ public class Board {
         }
     }
 
-    // Getters y setters
+    /**
+     * GETTERS Y SETTERS
+     */
     public Long getId() {
         return id;
     }
@@ -108,10 +110,14 @@ public class Board {
     }
 
     public void setUser(User user) {
-        this.user = user;
-
-        if (user != null && !user.getBoards().contains(this)) {
-            user.addBoard(this);
+        if (!Objects.equals(this.user, user)) { // Usamos Objects.equals para evitar NullPointerException
+            if (this.user != null) {
+                this.user.getBoards().remove(this);
+            }
+            this.user = user;
+            if (user != null && !user.getBoards().contains(this)) {
+                user.addBoard(this);
+            }
         }
     }
 

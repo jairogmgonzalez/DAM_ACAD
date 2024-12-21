@@ -27,154 +27,132 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException(("Tablero no encontrado con ID: " + id)));
     }
 
-    // Obtiene todos los tableros
-    public List<Board> getAllBoards() {
-        return boardRepository.findAll();
-    }
-
-    // Busca un tablero por su nombre
-    public List<Board> getBoardsByName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
-
-        return boardRepository.findByName(name);
-    }
-
-    // Busca un tablero por el id de usuario
+    // Busca los tableros de un usuario por su nombre
     public List<Board> getBoardsByUserId(Long userId) {
         userService.getUserById(userId);
 
         return boardRepository.findByUserId(userId);
     }
 
-    // Busca tableros creados después de una fecha determinada
-    public List<Board> getBoardsCreatedAfter(LocalDateTime date) {
-        if (date == null) {
-            throw new IllegalArgumentException("La fecha no puede ser nula");
-        }
-        return boardRepository.findBoardsCreatedAfter(date);
+    // Busca los tableros de un usuario por su nombre
+    public List<Board> getUserBoardsByName(Long userId, String name) {
+        userService.getUserById(userId);
+        validateName(name);
+
+        return boardRepository.findUserBoardsByName(userId, name);
     }
 
-    // Cuenta los tableros que tienen descripcion
-    public Long countBoardsWithDescription() {
-        return boardRepository.countBoardsWithDescription();
-    }
-
-    // Busca tableros que tengan al menos x categorías
-    public List<Board> getBoardsWithMinCategories(Long minCategories) {
-        if (minCategories < 0) {
-            throw new IllegalArgumentException("El número mínimo de categorías no puede ser negativo");
-        }
-        return boardRepository.findBoardsWithMinCategories(minCategories);
-    }
-
-    // Busca tableros con más de x tareas
-    public List<Board> getBoardsWithMoreThanXTasks(Long minTasks) {
-        if (minTasks < 0) {
-            throw new IllegalArgumentException("El número mínimo de tareas no puede ser negativo");
-        }
-        return boardRepository.findBoardsWithMoreThanXTasks(minTasks);
-    }
-
-    // Busca tableros que no tienen categorías asociadas
-    public List<Board> getBoardsWithoutCategories() {
-        return boardRepository.findBoardsWithoutCategories();
-    }
-
-    // Cuenta cuántos tableros asociados tiene un usuario
-    public Long countBoardsByUserId(Long userId) {
+    // Obtiene el número de tableros de un usuario
+    public Long getBoardsCountByUserId(Long userId) {
         userService.getUserById(userId);
 
         return boardRepository.countBoardsByUserId(userId);
     }
 
-    // Crea un nuevo tablero y lo guarda en la base de datos
+    // Busca los tableros de un usuario que tienen categorías
+    public List<Board> getUserBoardsWithCategories(Long userId) {
+        userService.getUserById(userId);
+
+        return boardRepository.findUserBoardsWithCategories(userId);
+    }
+
+    // Busca los tableros de un usuario que no tienen categorías
+    public List<Board> getUserBoardsWithoutCategories(Long userId) {
+        userService.getUserById(userId);
+
+        return boardRepository.findUserBoardsWithoutCategories(userId);
+    }
+
+    // Busca los tableros de un usuario creados antes de una fecha
+    public List<Board> getUsersBoardsCreatedBefore(Long userId, LocalDateTime date) {
+        userService.getUserById(userId);
+
+        return boardRepository.findUserBoardsCreatedBefore(userId, date);
+    }
+
+    // Busca los tableros de un usuario creados después de una fecha
+    public List<Board> getUsersBoardsCreatedAfter(Long userId, LocalDateTime date) {
+        userService.getUserById(userId);
+
+        return boardRepository.findUserBoardsCreatedAfter(userId, date);
+    }
+
+    // Crea un nuevo registro de tablero
     @Transactional
     public Board createBoard(Board board) {
         if (board.getId() != null) {
             throw new IllegalArgumentException("Un nuevo tablero no debe tener ID");
         }
 
-        // Valida los campos obligatorios
-        validateBoard(board);
-
-        // Verifica que el usuario existe
+        validateBoardFields(board);
         userService.getUserById(board.getUser().getId());
 
         return boardRepository.save(board);
     }
 
-    // Actualiza un tablero existente
+    // Actualiza el nombre de un tablero
     @Transactional
-    public Board updateBoard(Board board) {
-        Board existingBoard = getBoardById(board.getId());
+    public void updateBoardName(Long boardId, Long userId, String newName) {
+        Board existingBoard = getBoardById(boardId);
+        userService.getUserById(userId);
 
-        validateBoard(board);
+        validateName(newName);
 
-        // Verifica que el usuario existe
-        userService.getUserById(board.getUser().getId());
+        existingBoard.setName(newName);
 
-        // Actualiza solo los campos no nulos
-        if (board.getName() != null) {
-            existingBoard.setName(board.getName());
-        }
-
-        if (board.getDescription() != null) {
-            existingBoard.setDescription(board.getDescription());
-        }
-
-        if (board.getUser() != null) {
-            existingBoard.setUser(board.getUser());
-        }
-
-        return boardRepository.save(existingBoard);
-    }
-
-    // Actualiza solo el nombre de un tablero
-    @Transactional
-    public void updateBoardName(Long id, String newName) {
-        if (newName == null || newName.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre proporcionado no es válido");
-        }
-
-        getBoardById(id); // Verifica que el tablero existe
-
-        int updatedRows = boardRepository.updateBoardName(id, newName);
+        int updatedRows = boardRepository.updateBoardName(boardId, userId, newName);
         if (updatedRows == 0) {
-            throw new RuntimeException("No se pudo actualizar el nombre del tablero");
+            throw new RuntimeException("No se pudo actualizar el nombre");
         }
     }
 
-    // Elimina un tablero
+    // Actualiza la descripción de un tablero
     @Transactional
-    public void deleteBoard(Long id) {
-        getBoardById(id); // Verifica que el tablero existe
-        boardRepository.deleteById(id);
+    public void updateBoardDescription(Long boardId, Long userId, String newDescription) {
+        Board existingBoard = getBoardById(boardId);
+        userService.getUserById(userId);
+
+        validateDescription(newDescription);
+
+        existingBoard.setDescription(newDescription);
+
+        int updatedRows = boardRepository.updateBoardDescription(boardId, userId, newDescription);
+        if (updatedRows == 0) {
+            throw new RuntimeException("No se pudo actualizar la descripción");
+        }
     }
 
-    // Métodos adicionales para gestión de categorías
+    // Elimina un regisro de un tablero
     @Transactional
-    public Board addCategoryToBoard(Long boardId, Category category) {
+    public void deleteBoard(Long boardId, Long userId) {
         Board board = getBoardById(boardId);
-        board.addCategory(category);
-        return boardRepository.save(board);
+
+        if (!board.getUser().getId().equals(userId)) {
+            throw new RuntimeException("No tienes permiso para eliminar este tablero");
+        }
+
+        boardRepository.deleteById(boardId);
     }
 
-    @Transactional
-    public Board removeCategoryFromBoard(Long boardId, Category category) {
-        Board board = getBoardById(boardId);
-        board.removeCategory(category);
-        return boardRepository.save(board);
+
+    // Métodos privados de validación
+    private void validateBoardFields(Board board) {
+        validateName(board.getName());
+        validateDescription(board.getDescription());
+        if (board.getUser() == null) {
+            throw new IllegalArgumentException("El tablero debe pertenecer a un usuario");
+        }
     }
 
-    // Método privado para validaciones comunes
-    private void validateBoard(Board board) {
-        if (board.getName() == null || board.getName().trim().isEmpty()) {
+    private void validateName(String name) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
-        if (board.getUser() == null) {
-            throw new IllegalArgumentException("Debe pertenecer a un usuario");
+    }
+
+    private void validateDescription(String description) {
+        if (description == null && description.trim().isEmpty()) {
+            throw new IllegalArgumentException("La descripción no puede estar vacía");
         }
     }
 

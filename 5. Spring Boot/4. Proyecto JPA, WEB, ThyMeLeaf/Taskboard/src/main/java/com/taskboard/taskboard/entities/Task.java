@@ -53,15 +53,18 @@ public class Task {
     @Column(name = "priority")
     private TaskPriority priority;
 
+    @Column(name = "due_date")
+    private LocalDateTime dueDate;
+
     @JsonIgnoreProperties("tasks")
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false, updatable = true)
     private LocalDateTime updatedAt;
 
     // Constructor por defecto
@@ -75,11 +78,12 @@ public class Task {
     }
 
     // Constructor por parámetros completo
-    public Task(String name, String description, TaskStatus status, TaskPriority priority, Category category) {
+    public Task(String name, String description, TaskStatus status, TaskPriority priority, LocalDateTime dueDate, Category category) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.priority = priority;
+        this.dueDate = dueDate;
         this.category = category;
     }
 
@@ -120,6 +124,10 @@ public class Task {
         this.priority = priority;
     }
 
+    public LocalDateTime getDueDate() { return dueDate; }
+
+    public void setDueDate(LocalDateTime dueDate) { this.dueDate = dueDate; }
+
     public Category getCategory() {
         return category;
     }
@@ -159,10 +167,13 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 ", priority=" + priority +
+                ", dueDate=" + dueDate +
                 ", categoryId=" + (category != null ? category.getId() : null) +
-                ", categoryName=" + (category != null ? category.getName() : null) +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
+
 
     // Método equals
     @Override

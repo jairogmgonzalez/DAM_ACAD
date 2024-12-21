@@ -17,50 +17,44 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-        // Búsqueda por campos específicos
-        List<Board> findByName(String name);
-
+        // Obtiene todos los tableros de un usuario
         List<Board> findByUserId(Long userId);
 
-        // Busca tableros creados después de una fecha específica
-        @Query("SELECT b FROM Board b WHERE b.createdAt > :date")
-        List<Board> findBoardsCreatedAfter(@Param("date") LocalDateTime date);
+        // Busca tableros de un usuario por nombre
+        @Query("SELECT b FROM Board b WHERE b.user.id = :userId AND LOWER(b.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+        List<Board> findUserBoardsByName(@Param("userId") Long userId, @Param("name") String name);
 
-        // Cuenta los tableros que tienen descripción
-        @Query("SELECT COUNT(b) FROM Board b WHERE b.description IS NOT NULL")
-        Long countBoardsWithDescription();
+        // Obtiene el número de tableros de un usuario
+        @Query("SELECT COUNT(b) FROM Board b WHERE b.user.id = :userId")
+        Long countBoardsByUserId(@Param("userId") Long userId);
 
-        @Query(value = "SELECT b.id, b.name, b.description, b.user_id, b.created_at, b.updated_at " +
-                "FROM boards b " +
-                "JOIN categories c ON b.id = c.board_id " +
-                "GROUP BY b.id, b.name, b.description, b.user_id, b.created_at, b.updated_at " +
-                "HAVING COUNT(c.id) >= :minCategories", nativeQuery = true)
-        List<Board> findBoardsWithMinCategories(@Param("minCategories") Long minCategories);
+        // Busca tableros de un usuario que tienen categorías
+        @Query("SELECT b FROM Board b WHERE b.user.id = :userId AND b.categories IS NOT EMPTY")
+        List<Board> findUserBoardsWithCategories(@Param("userId") Long userId);
 
-        // Busca tableros con más de x tareas
-        @Query(value = "SELECT b.* FROM boards b " +
-                        "JOIN categories c ON b.id = c.board_id " +
-                        "JOIN tasks t ON c.id = t.category_id " +
-                        "GROUP BY b.id " +
-                        "HAVING COUNT(t.id) > :minTasks", nativeQuery = true)
-        List<Board> findBoardsWithMoreThanXTasks(@Param("minTasks") Long minTasks);
+        // Busca tableros de un usuario sin categorías
+        @Query("SELECT b FROM Board b WHERE b.user.id = :userId AND b.categories IS EMPTY")
+        List<Board> findUserBoardsWithoutCategories(@Param("userId") Long userId);
 
-        // Busca tableros que no tienen categorías asociadas
-        @Query("SELECT b FROM Board b WHERE b.categories IS EMPTY")
-        List<Board> findBoardsWithoutCategories();
+        // Busca tableros de un usuario creados antes de una fecha
+        @Query("SELECT b FROM Board b WHERE b.user.id = :userId AND b.createdAt < :date")
+        List<Board> findUserBoardsCreatedBefore(@Param("userId") Long userId, @Param("date") LocalDateTime date);
 
-        // Busca tableros que tienen categorías
-        @Query("SELECT b FROM Board b WHERE b.categories IS NOT EMPTY")
-        List<Board> findBoardsWithCategories();
-
-        // Cuenta cuántos tableros tiene un usuario específico
-        @Query(value = "SELECT COUNT(*) FROM boards b WHERE b.user_id = :userId", nativeQuery = true)
-        long countBoardsByUserId(@Param("userId") Long userId);
+        // Busca tableros de un usuario creados después de una fecha
+        @Query("SELECT b FROM Board b WHERE b.user.id = :userId AND b.createdAt > :date")
+        List<Board> findUserBoardsCreatedAfter(@Param("userId") Long userId, @Param("date") LocalDateTime date);
 
         // Actualiza el nombre de un tablero
         @Modifying
         @Transactional
-        @Query("UPDATE Board b SET b.name = :newName WHERE b.id = :boardId")
-        int updateBoardName(@Param("boardId") Long boardId, @Param("newName") String newName);
+        @Query("UPDATE Board b SET b.name = :newName WHERE b.id = :boardId AND b.user.id = :userId")
+        int updateBoardName(@Param("boardId") Long boardId, @Param("userId") Long userId, @Param("newName") String newName);
+
+        // Actualiza la descripción de de un tablero
+        @Modifying
+        @Transactional
+        @Query("UPDATE Board b SET b.description = :newDescription WHERE b.id = :boardId AND b.user.id = :userId")
+        int updateBoardDescription(@Param("boardId") Long boardId, @Param("userId") Long userId, @Param("newDescription") String newDescription);
 
 }
+
