@@ -11,24 +11,27 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Controlador Web para gestión de Usuarios
+ */
 @Controller
 @RequestMapping("/user")
 public class UserWebController {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private BoardService boardService;
-
     @Autowired
     private CategoryService categoryService;
-
     @Autowired
     private TaskService taskService;
 
     private static final Long USER_ID = 1L;
 
+    /**
+     * Muestra perfil de usuario con estadísticas
+     */
     @GetMapping("/{id}")
     public String showProfile(@PathVariable Long id, Model model) {
         User user = userService.getUserById(id);
@@ -44,6 +47,9 @@ public class UserWebController {
         return "user";
     }
 
+    /**
+     * Actualiza datos de perfil de usuario
+     */
     @PostMapping("/{id}/update")
     public String updateProfile(@PathVariable("id") Long id,
                                 @RequestParam("newUsername") String newUsername,
@@ -58,5 +64,4 @@ public class UserWebController {
         }
         return "redirect:/user/" + id;
     }
-
 }

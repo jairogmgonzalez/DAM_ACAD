@@ -16,62 +16,86 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 
+/**
+ * Entidad que representa un usuario en el sistema.
+ */
 @Entity
 @Table(name = "users")
 public class User {
 
+    /** ID del usuario */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Nombre de usuario */
     @Column(name = "username", length = 50, nullable = false, unique = true)
     private String username;
 
+    /** Email del usuario */
     @Column(name = "email", length = 120, nullable = false, unique = true)
     private String email;
 
+    /** Tableros asociados al usuario */
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Board> boards = new HashSet<Board>();
 
+    /** Fecha de creación */
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    /** Fecha de última actualización */
     @Column(name = "updated_at", insertable = false, updatable = true)
     private LocalDateTime updatedAt;
 
+    /** Constructor por defecto */
     public User() {
     }
 
+    /**
+     * Constructor con campos obligatorios
+     * @param username nombre de usuario
+     * @param email email del usuario
+     */
     public User(String username, String email) {
         this.username = username;
         this.email = email;
     }
 
-
+    /**
+     * Constructor completo
+     * @param username nombre de usuario
+     * @param email email del usuario
+     * @param boards tableros del usuario
+     */
     public User(String username, String email, Set<Board> boards) {
         this.username = username;
         this.email = email;
         this.boards = boards;
     }
 
+    /**
+     * Añade un tablero al usuario
+     * @param board tablero a añadir
+     */
     public void addBoard(Board board) {
         boards.add(board);
         board.setUser(this);
     }
 
+    /**
+     * Elimina un tablero del usuario
+     * @param board tablero a eliminar
+     */
     public void removeBoard(Board board) {
         boards.remove(board);
         board.setUser(null);
     }
 
-    /**
-     * GETTERS Y SETTERS
-     */
+    /** GETTERS Y SETTERS */
     public Long getId() {
         return id;
     }
@@ -100,6 +124,11 @@ public class User {
         return boards;
     }
 
+    /**
+     * Establece los tableros asociados al usuario.
+     *
+     * @param boards conjunto de tableros a asociar
+     */
     public void setBoards(Set<Board> boards) {
         this.boards = boards;
 
@@ -120,17 +149,19 @@ public class User {
         return updatedAt;
     }
 
+    /** Establece la fecha de creación */
     @PrePersist
     private void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
+    /** Actualiza la fecha de modificación */
     @PreUpdate
     private void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
-    // Método toString
+    /** Método toString */
     @Override
     public String toString() {
         return "User{" +
@@ -140,7 +171,7 @@ public class User {
                 '}';
     }
 
-    // Método equals
+    /** Método equals */
     @Override
     public boolean equals(Object other) {
         if (this == other)
@@ -152,7 +183,7 @@ public class User {
         return Objects.equals(id, that.id);
     }
 
-    // Método hashCode
+    /** Método hashCode */
     @Override
     public int hashCode() {
         return Objects.hash(id);

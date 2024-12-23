@@ -11,30 +11,37 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Controlador Web para gestión de Categorías
+ */
 @Controller
 @RequestMapping("/categories")
 public class CategoryWebController {
 
     @Autowired
     private CategoryService categoryService;
-
     @Autowired
     private BoardService boardService;
     @Autowired
     private TaskService taskService;
 
+    /**
+     * Muestra formulario de creación
+     */
     @GetMapping("/{boardId}/add")
     public String addCategory(@PathVariable("boardId") Long boardId, Model model) {
         Board board = boardService.getBoardById(boardId);
         model.addAttribute("board", board);
-
         return "category-add";
     }
 
+    /**
+     * Muestra formulario de actualización
+     */
     @GetMapping("/{boardId}/update/{categoryId}")
     public String updateCategory(@PathVariable("boardId") Long boardId,
-                                  @PathVariable("categoryId") Long categoryId,
-                                  Model model) {
+                                 @PathVariable("categoryId") Long categoryId,
+                                 Model model) {
         Board board = boardService.getBoardById(boardId);
         Category category = categoryService.getCategoryById(categoryId);
 
@@ -45,13 +52,9 @@ public class CategoryWebController {
         return "category-update";
     }
 
-    @GetMapping("/{boardId}/delete/{categoryId}")
-    public String deleteBoard(@PathVariable("boardId") Long boardId, @PathVariable("categoryId") Long categoryId) {
-        categoryService.deleteCategory(categoryId, boardId);
-
-        return "redirect:/boards/" + boardId;
-    }
-
+    /**
+     * Crea nueva categoría
+     */
     @PostMapping("/{boardId}/add")
     public String addCategory(@PathVariable("boardId") Long boardId,
                               @RequestParam("name") String name,
@@ -71,6 +74,9 @@ public class CategoryWebController {
         }
     }
 
+    /**
+     * Actualiza categoría existente
+     */
     @PostMapping("/{boardId}/update/{categoryId}")
     public String updateCategory(@PathVariable("boardId") Long boardId,
                                  @PathVariable("categoryId") Long categoryId,
@@ -78,13 +84,23 @@ public class CategoryWebController {
                                  @RequestParam("newDescription") String newDescription,
                                  RedirectAttributes redirectAttributes) {
         try {
-            categoryService.updateCategoryName(categoryId, boardId, newName);
+            categoryService.updateCategoryName(categoryId, newName);
             categoryService.updateCategoryDescription(categoryId, boardId, newDescription);
             redirectAttributes.addFlashAttribute("message", "Categoría actualizada correctamente");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/categories/" + boardId + "/update/" + categoryId;
+    }
+
+    /**
+     * Elimina categoría
+     */
+    @GetMapping("/{boardId}/delete/{categoryId}")
+    public String deleteBoard(@PathVariable("boardId") Long boardId,
+                              @PathVariable("categoryId") Long categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return "redirect:/boards/" + boardId;
     }
 }
 

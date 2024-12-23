@@ -3,8 +3,6 @@ package com.taskboard.taskboard.services;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.taskboard.taskboard.entities.Category;
-import com.taskboard.taskboard.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,118 +13,177 @@ import com.taskboard.taskboard.repositories.TaskRepository;
 
 import jakarta.transaction.Transactional;
 
+/**
+ * Servicio para la gestión de Tareas
+ */
 @Service
 public class TaskService {
 
     @Autowired
     private TaskRepository taskRepository;
-
     @Autowired
     private CategoryService categoryService;
-
     @Autowired
     private UserService userService;
     @Autowired
     private BoardService boardService;
 
-    // Busca una tarea por su id
+    /**
+     * Obtiene tarea por ID
+     */
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tarea no encontrada con ID: " + id));
     }
 
-    // Busca las tareas de una categoría por su id
+    /**
+     * Obtiene todas las tareas
+     */
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
+
+    /**
+     * Busca por nombre
+     */
+    public List<Task> getTaskByName(String name) {
+        validateName(name);
+        return taskRepository.findByName(name);
+    }
+
+    /**
+     * Obtiene tareas de categoría
+     */
     public List<Task> getTasksByCategoryId(Long categoryId) {
         categoryService.getCategoryById(categoryId);
-
         return taskRepository.findByCategoryId(categoryId);
     }
 
-    // Busca las tareas de una categoría por nombre
+    /**
+     * Busca por nombre en categoría
+     */
     public List<Task> getCategoryTasksByName(Long categoryId, String name) {
         categoryService.getCategoryById(categoryId);
         validateName(name);
-
         return taskRepository.findCategoryTasksByName(categoryId, name);
     }
 
-    // Busca las tareas de una categoría por estado
+    /**
+     * Cuenta tareas en categoría
+     */
+    public Long getCountTasksByCategoryId(Long categoryId) {
+        categoryService.getCategoryById(categoryId);
+        return taskRepository.countTasksByCategoryId(categoryId);
+    }
+
+    /**
+     * Busca por estado en categoría
+     */
     public List<Task> getCategoryTasksByStatus(Long categoryId, TaskStatus status) {
         categoryService.getCategoryById(categoryId);
         validateStatus(status);
-
         return taskRepository.findCategoryTasksByStatus(categoryId, status);
     }
 
-    // Busca las tareas de una categoría por prioridad
+    /**
+     * Busca por prioridad en categoría
+     */
     public List<Task> getCategoryTasksByPriority(Long categoryId, TaskPriority priority) {
         categoryService.getCategoryById(categoryId);
         validatePriority(priority);
-
         return taskRepository.findCategoryTasksByPriority(categoryId, priority);
     }
 
-    // Busca las tareas de una categoría próximas a vencer
+    /**
+     * Busca todas por estado
+     */
+    public List<Task> getTasksByStatus(TaskStatus status) {
+        return taskRepository.findByStatus(status);
+    }
+
+    /**
+     * Busca todas por prioridad
+     */
+    public List<Task> getTasksByPriority(TaskPriority priority) {
+        return taskRepository.findByPriority(priority);
+    }
+
+    /**
+     * Busca alta prioridad
+     */
+    public List<Task> getHighPriorityTasks() {
+        return taskRepository.findHighPriorityTasks();
+    }
+
+    /**
+     * Busca próximas a vencer
+     */
     public List<Task> getUpcomingTasks(Long categoryId, LocalDateTime start, LocalDateTime end) {
         categoryService.getCategoryById(categoryId);
-
         return taskRepository.findUpcomingTasks(categoryId, start, end);
     }
 
-    // Busca las tareas de una categoría vencidas
+    /**
+     * Busca vencidas
+     */
     public List<Task> getOverdueTasks(Long categoryId, LocalDateTime now) {
         categoryService.getCategoryById(categoryId);
-
         return taskRepository.findOverdueTasks(categoryId, now);
     }
 
-    // Busca todas las tareas de una categoría ordenadas por fecha de creación
-    public List<Task> getLatestTasks(Long categoryId) {
-        categoryService.getCategoryById(categoryId);
-
-        return taskRepository.findLatestTasks(categoryId);
+    /**
+     * Busca por rango de fechas
+     */
+    public List<Task> getTasksCreatedBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("La fecha no puede ser nula");
+        }
+        return taskRepository.findTasksCreatedBetweenDates(startDate, endDate);
     }
 
-    // Busca todas las tareas de una categoría ordenadas por fecha de creación
+    /**
+     * Ordena por fecha creación
+     */
+    public List<Task> getLatestTasks() {
+        return taskRepository.findLatestTasks();
+    }
+
+    /**
+     * Ordena por fecha vencimiento
+     */
     public List<Task> getTasksOrderByDueDateDesc(Long categoryId) {
         categoryService.getCategoryById(categoryId);
-
         return taskRepository.findTasksOrderByDueDateDesc(categoryId);
     }
 
-    // Obtiene el número de tareas por estado en una categoría
+    /**
+     * Cuenta por estado en categoría
+     */
     public Long getTasksCountByCategoryAndStatus(Long categoryId, TaskStatus status) {
         categoryService.getCategoryById(categoryId);
         validateStatus(status);
-
         return taskRepository.countByCategoryIdAndStatus(categoryId, status);
     }
 
-    public boolean isTaskOverdue(Task task) {
-        return task.getDueDate() != null &&
-                task.getDueDate().isBefore(LocalDateTime.now()) &&
-                task.getStatus() != TaskStatus.COMPLETED;
-    }
-
-    public boolean isTaskCompleted(Task task) {
-        return TaskStatus.COMPLETED.equals(task.getStatus());
-    }
-
-    // Obtiene el número de tareas totales de un usuario
+    /**
+     * Cuenta por usuario
+     */
     public Long getTasksCountByUserId(Long userId) {
         userService.getUserById(userId);
-
         return taskRepository.countTasksByUserId(userId);
     }
 
-    // Obtiene el número de tareas totales de un tablero
+    /**
+     * Cuenta por tablero
+     */
     public Long getTasksCountByBoardId(Long boardId) {
         boardService.getBoardById(boardId);
-
         return taskRepository.countTasksByBoardId(boardId);
     }
 
-    // Crea un nuevo registro de tarea
+    /**
+     * Crea nueva tarea
+     */
     @Transactional
     public Task createTask(Task task) {
         if (task.getId() != null) {
@@ -136,57 +193,47 @@ public class TaskService {
         validateTask(task);
         categoryService.getCategoryById(task.getCategory().getId());
 
-        if (task.getStatus() == null) {
-            task.setStatus(TaskStatus.PENDING);
-        }
-        if (task.getPriority() == null) {
-            task.setPriority(TaskPriority.MEDIUM);
-        }
+        task.setStatus(task.getStatus() == null ? TaskStatus.PENDING : task.getStatus());
+        task.setPriority(task.getPriority() == null ? TaskPriority.MEDIUM : task.getPriority());
 
         return taskRepository.save(task);
     }
 
+    /**
+     * Actualiza tarea existente
+     */
     @Transactional
     public Task updateTask(Task task) {
-        if (task.getId() == null) {
-            throw new IllegalArgumentException("La tarea debe tener un ID para ser actualizada");
-        }
-
-        // Busca la tarea existente en la base de datos
         Task existingTask = taskRepository.findById(task.getId())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la tarea con ID: " + task.getId()));
 
-        // Actualiza los campos solo si no son nulos
-        if (task.getName() != null) {
-            existingTask.setName(task.getName());
-        }
-        if (task.getDescription() != null) {
-            existingTask.setDescription(task.getDescription());
-        }
-        if (task.getStatus() != null) {
-            existingTask.setStatus(task.getStatus());
-        }
-        if (task.getPriority() != null) {
-            existingTask.setPriority(task.getPriority());
-        }
-        if (task.getDueDate() != null) {
-            existingTask.setDueDate(task.getDueDate());
-        }
+        if (task.getName() != null) existingTask.setName(task.getName());
+        if (task.getDescription() != null) existingTask.setDescription(task.getDescription());
+        if (task.getStatus() != null) existingTask.setStatus(task.getStatus());
+        if (task.getPriority() != null) existingTask.setPriority(task.getPriority());
+        if (task.getDueDate() != null) existingTask.setDueDate(task.getDueDate());
 
-        // Validación adicional (si es necesario)
         validateTask(existingTask);
-
-        // Guarda la tarea actualizada
         return taskRepository.save(existingTask);
     }
 
-    // Actualiza el nombre de una tarea
+    /**
+     * Elimina tarea
+     */
+    @Transactional
+    public void deleteTask(Long taskId) {
+        getTaskById(taskId);
+        taskRepository.deleteById(taskId);
+    }
+
+
+    /**
+     * Actualiza nombre
+     */
     @Transactional
     public void updateTaskName(Long taskId, Long categoryId, String newName) {
-        Task existingTask = getTaskById(taskId);
-        categoryService.getCategoryById(categoryId);
-
         validateName(newName);
+        verifyTaskAndCategory(taskId, categoryId);
 
         int updatedRows = taskRepository.updateTaskName(taskId, categoryId, newName);
         if (updatedRows == 0) {
@@ -194,13 +241,13 @@ public class TaskService {
         }
     }
 
-    // Actualiza la descripción de una tarea
+    /**
+     * Actualiza descripción
+     */
     @Transactional
     public void updateTaskDescription(Long taskId, Long categoryId, String newDescription) {
-        Task existingTask = getTaskById(taskId);
-        categoryService.getCategoryById(categoryId);
-
         validateDescription(newDescription);
+        verifyTaskAndCategory(taskId, categoryId);
 
         int updatedRows = taskRepository.updateTaskDescription(taskId, categoryId, newDescription);
         if (updatedRows == 0) {
@@ -208,79 +255,53 @@ public class TaskService {
         }
     }
 
-    // Actualiza el status de una tarea
+    /**
+     * Actualiza estado
+     */
     @Transactional
-    public void updateTaskStatus(Long taskId, Long categoryId, TaskStatus newStatus) {
-        Task existingTask = getTaskById(taskId);
-        categoryService.getCategoryById(categoryId);
-
+    public void updateTaskStatus(Long taskId, TaskStatus newStatus) {
         validateStatus(newStatus);
+        getTaskById(taskId);
 
-        int updatedRows = taskRepository.updateTaskStatus(taskId, categoryId, newStatus);
+        int updatedRows = taskRepository.updateTaskStatus(taskId, newStatus);
         if (updatedRows == 0) {
             throw new RuntimeException("No se pudo actualizar el status");
         }
     }
 
-    // Actualiza la prioridad de una tarea
-    @Transactional
-    public void updateTaskPriority(Long taskId, Long categoryId, TaskPriority newPriority) {
-        Task existingTask = getTaskById(taskId);
-        categoryService.getCategoryById(categoryId);
-
-        validatePriority(newPriority);
-
-        int updatedRows = taskRepository.updateTaskPriority(taskId, categoryId, newPriority);
-        if (updatedRows == 0) {
-            throw new RuntimeException("No se pudo actualizar la prioridad");
-        }
+    /**
+     * Verifica si está vencida
+     */
+    public boolean isTaskOverdue(Task task) {
+        return task.getDueDate() != null &&
+                task.getDueDate().isBefore(LocalDateTime.now()) &&
+                task.getStatus() != TaskStatus.COMPLETED;
     }
 
-    // Actualiza la fecha de vencimiento de una tarea
-    @Transactional
-    public void updateTaskDueDate(Long taskId, Long categoryId, LocalDateTime dueDate) {
-        Task existingTask = getTaskById(taskId);
-        categoryService.getCategoryById(categoryId);
-
-        validateDueDate(dueDate);
-
-        int updatedRows = taskRepository.updateTaskDueDate(taskId, categoryId, dueDate);
-        if (updatedRows == 0) {
-            throw new RuntimeException("No se pudo actualizar la fecha de vencimiento");
-        }
+    /**
+     * Verifica si está completada
+     */
+    public boolean isTaskCompleted(Task task) {
+        return TaskStatus.COMPLETED.equals(task.getStatus());
     }
 
-    // Elimina un registro de tarea
-    @Transactional
-    public void deleteTask(Long taskId, Long categoryId) {
-        Task task = getTaskById(taskId);
-        categoryService.getCategoryById(categoryId);
-
-        if (!task.getCategory().getId().equals(categoryId)) {
-            throw new RuntimeException("La tarea no pertenece a esta categoría");
-        }
-
-        taskRepository.deleteById(taskId);
-    }
-
-    // Método privado para validaciones comunes
+    /**
+     * MÉTODOS DE VALIDACIÓN
+     */
     private void validateTask(Task task) {
         validateName(task.getName());
-        if (task.getDescription() != null) {
-            validateDescription(task.getDescription());
-        }
+        if (task.getDescription() != null) validateDescription(task.getDescription());
+        if (task.getDueDate() != null) validateDueDate(task.getDueDate());
+        if (task.getStatus() != null) validateStatus(task.getStatus());
+        if (task.getPriority() != null) validatePriority(task.getPriority());
         if (task.getCategory() == null) {
             throw new IllegalArgumentException("La tarea debe pertenecer a una categoría");
         }
-        if (task.getDueDate() != null) {
-            validateDueDate(task.getDueDate());
-        }
-        if (task.getStatus() != null) {
-            validateStatus(task.getStatus());
-        }
-        if (task.getPriority() != null) {
-            validatePriority(task.getPriority());
-        }
+    }
+
+    private void verifyTaskAndCategory(Long taskId, Long categoryId) {
+        getTaskById(taskId);
+        categoryService.getCategoryById(categoryId);
     }
 
     private void validateName(String name) {
@@ -290,7 +311,7 @@ public class TaskService {
     }
 
     private void validateDescription(String description) {
-        if (description != null && description.trim().isEmpty()) {
+        if (description == null && description.trim().isEmpty()) {
             throw new IllegalArgumentException("La descripción no puede estar vacía si se proporciona");
         }
     }
@@ -303,7 +324,7 @@ public class TaskService {
 
     private void validatePriority(TaskPriority priority) {
         if (priority == null) {
-            throw new IllegalArgumentException("La prioridad no puede ser nulo");
+            throw new IllegalArgumentException("La prioridad no puede ser nula");
         }
     }
 

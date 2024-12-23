@@ -20,47 +20,66 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * Entidad que representa una categoría dentro de un tablero.
+ */
 @Entity
 @Table(name = "categories")
 public class Category {
 
+    /** ID de la categoría */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Nombre de la categoría */
     @Column(name = "name", length = 50, nullable = false)
     @NotBlank
     private String name;
 
+    /** Descripción de la categoría */
     @Column(name = "description", length = 255)
     private String description;
 
+    /** Tablero asociado a la categoría */
     @JsonIgnoreProperties("categories")
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
+    /** Conjunto de tareas asociadas a la categoría */
     @JsonIgnoreProperties("category")
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Task> tasks = new HashSet<Task>();
 
+    /** Fecha de creación */
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    /** Fecha de última actualización */
     @Column(name = "updated_at", insertable = false, updatable = true)
     private LocalDateTime updatedAt;
 
-    // Constructor por defecto
+    /** Constructor por defecto */
     public Category() {
     }
 
-    // Constructor por parámetros completo
+    /**
+     * Constructor con los campos obligatorios.
+     *
+     * @param name  nombre de la categoría
+     * @param board tablero al que pertenece la categoría
+     */
     public Category(String name, Board board) {
         this.name = name;
         this.board = board;
     }
 
-    // Métodos adicionales
+    /**
+     * Añade una tarea a la categoría.
+     *
+     * @param task tarea a añadir
+     */
     public void addTask(Task task) {
         if (!tasks.contains(task)) {
             tasks.add(task);
@@ -68,6 +87,11 @@ public class Category {
         }
     }
 
+    /**
+     * Elimina una tarea de la categoría.
+     *
+     * @param task tarea a eliminar
+     */
     public void removeTask(Task task) {
         if (tasks.contains(task)) {
             tasks.remove(task);
@@ -78,6 +102,7 @@ public class Category {
     /**
      * GETTERS Y SETTERS
      */
+
     public Long getId() {
         return id;
     }
@@ -90,14 +115,23 @@ public class Category {
         this.name = name;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public void setDescription(String description) { this.description = description; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Board getBoard() {
         return board;
     }
 
+    /**
+     * Establece el tablero al que pertenece la categoría.
+     *
+     * @param board tablero asociado
+     */
     public void setBoard(Board board) {
         this.board = board;
 
@@ -110,6 +144,11 @@ public class Category {
         return tasks;
     }
 
+    /**
+     * Establece el conjunto de tareas asociadas a la categoría.
+     *
+     * @param tasks conjunto de tareas
+     */
     public void setTasks(Set<Task> tasks) {
         this.tasks.clear();
 
@@ -128,17 +167,19 @@ public class Category {
         return updatedAt;
     }
 
+    /** Establece la fecha de creación */
     @PrePersist
     private void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
+    /** Actualiza la fecha de modificación */
     @PreUpdate
     private void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
-    // Método toString
+    /** Método toString */
     @Override
     public String toString() {
         return "Category {" +
@@ -148,7 +189,7 @@ public class Category {
                 "}";
     }
 
-    // Método equals
+    /** Método equals */
     @Override
     public boolean equals(Object other) {
         if (this == other)
@@ -160,10 +201,9 @@ public class Category {
         return Objects.equals(id, that.id);
     }
 
-    // Método hashCode
+    /** Método hashCode */
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }
