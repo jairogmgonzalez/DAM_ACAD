@@ -12,6 +12,7 @@ function MiCard() {
                 color: '#c9d1d9',
                 borderRadius: 2,
                 mx: { xs: 2, sm: 0 },
+                height: 'fit-content',
                 '&:hover': {
                     boxShadow: 12,
                     transform: 'translateY(-5px)',
@@ -19,9 +20,9 @@ function MiCard() {
                 },
             }}
         >
-            <CardMedia
+             <CardMedia
                 sx={{
-                    height: { xs: 300, sm: 400 },
+                    height: 250, 
                     width: '100%',
                     borderRadius: '8px 8px 0 0',
                     objectFit: 'cover',

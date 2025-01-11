@@ -16,10 +16,12 @@ function MiContent() {
                 alignItems: 'center',
                 px: { xs: 2, md: 6 },
                 py: { xs: 4, md: 6 },
+                bgcolor: '#0d1117'
             }}
         >
             <Grid
                 container
+                spacing={4}
                 justifyContent="center"
                 alignItems="center"
                 sx={{ height: '100%' }}
@@ -28,9 +30,9 @@ function MiContent() {
                     item
                     xs={12}
                     md={6}
-                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 10 }}
+                    sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}
                 >
-                    <Box sx={{ maxWidth: 800, justifyContent: 'flex-start' }}>
+                    <Box sx={{ maxWidth: 800, p: { xs: 2, md: 4 }, justifyContent: 'flex-start' }}>
                         <Typography
                             component="h1"
                             sx={{
@@ -39,6 +41,7 @@ function MiContent() {
                                 letterSpacing: '-0.02em',
                                 color: '#e6edf3',
                                 lineHeight: 1.1,
+                                mb: 2,
                             }}
                         >
                             Control de versiones
@@ -48,17 +51,17 @@ function MiContent() {
                                 fontSize: { xs: '1.25rem', md: '1.75rem' },
                                 color: '#8b949e',
                                 fontWeight: '500',
-                                lineHeight: 3,
-                                mb: 2,
+                                lineHeight: 1.5,
+                                mb: 3,
                             }}
                         >
                             Gestiona tus proyectos de forma eficiente y profesional
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <Typography
                                 sx={{
-                                    fontSize: { xs: '1rem', md: '1.2rem' }, 
-                                    lineHeight: 1.8,
+                                    fontSize: { xs: '1rem', md: '1.2rem' },
+                                    lineHeight: 1.6,
                                     color: '#c9d1d9',
                                 }}
                             >
@@ -71,7 +74,7 @@ function MiContent() {
                             <Typography
                                 sx={{
                                     fontSize: { xs: '1rem', md: '1.2rem' },
-                                    lineHeight: 1.8,
+                                    lineHeight: 1.6,
                                     color: '#c9d1d9',
                                 }}
                             >
@@ -87,16 +90,15 @@ function MiContent() {
                     item
                     xs={12}
                     md={6}
-                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
                 >
-                    <Box
-                        sx={{
-                            '&:hover': {
-                                transform: 'translateY(-8px) scale(1.05)',
-                                transition: 'transform 0.3s ease-in-out',
-                            },
-                        }}
-                    >
+                    <Box sx={{
+                        width: '100%',
+                        maxWidth: { xs: '100%', sm: 405 },  // Limitamos el ancho máximo
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
                         <MiCard />
                     </Box>
                 </Grid>
