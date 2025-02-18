@@ -1,4 +1,4 @@
-export async function FetchWeather(city: string) {
+export async function WeatherFetch(city: string) {
     const API_WEATHER = `https://api.weatherapi.com/v1/current.json?key=${import.meta.env.VITE_API_KEY}&lang=es&q=${city}`;
 
     try {
@@ -7,7 +7,8 @@ export async function FetchWeather(city: string) {
             throw new Error('No se encontraron datos para la ciudad ingresada');
         }
 
-        return await response.json();
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error("Error en la API:", error);
         return null;

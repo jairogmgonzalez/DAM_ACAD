@@ -1,5 +1,5 @@
 import { Box, Typography, Card, CardContent } from "@mui/material";
-import { Weather } from '../types/weather';
+import { Weather } from '../types/Weather';
 
 interface WeatherDisplayProps {
     weather: Weather;
